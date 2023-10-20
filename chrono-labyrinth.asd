@@ -6,6 +6,7 @@
   :licence "Apache 2.0"
 
   :depends-on ("uiop" "asdf"
+               "sdl2"
                "sketch" "sketch-utils"
                "stopclock"
                "alexandria" "serapeum"

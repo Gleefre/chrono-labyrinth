@@ -28,3 +28,9 @@
                    (s:make-font :face (s:load-resource (data-path "font/PromptFont.ttf"))
                                 :color s:+black+
                                 :size 16)))))
+
+;; SDL_GetPerformanceCounter based clock
+(let ((frequency (sdl2:get-performance-frequency)))
+  (defun sdl-performance-counter ()
+    (/ (sdl2:get-performance-counter)
+       frequency)))
