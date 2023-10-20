@@ -1,0 +1,61 @@
+name: Windows build
+on: [workflow_dispatch]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-2019, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: mingw-w64-x86_64-libffi make mingw-w64-x86_64-pkg-config mingw-w64-x86_64-gcc
+
+    - name: install sbcl
+      run: choco install sbcl
+    - name: install quicklisp
+      run: |
+        curl -O https://beta.quicklisp.org/quicklisp.lisp
+        C:/ProgramData/chocolatey/bin/sbcl.exe --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --eval "(ql-util:without-prompting (ql:add-to-init-file))" --eval "(print ql:*quicklisp-home*)" --eval "(print (user-homedir-pathname))" --quit
+      shell: msys2 {0}
+
+    - name: install sketch & sketch-utils from source
+      run: |
+        cd D:/a/_temp/msys64/home/runneradmin/quicklisp/local-projects/ # FIXME
+        git clone https://github.com/Gleefre/sketch -b gleefre/dev
+        git clone https://github.com/Gleefre/sketch-utils
+      shell: bash
+
+    - name: download SDL2
+      uses: albin-johansson/download-sdl2@v2
+      with:
+        version: 2.26.5
+        sources_destination: .
+        binaries_destination: .
+    - name: download SDL2-IMAGE
+      uses: albin-johansson/download-sdl2-image@v2
+      with:
+        version: 2.6.3
+        sources_destination: .
+        binaries_destination: .
+    - name: download SDL-TTF
+      uses: albin-johansson/download-sdl2-ttf@v1
+      with:
+        version: 2.20.2
+        sources_destination: .
+        binaries_destination: .
+
+    - name: build
+      run: LISP=C:/ProgramData/chocolatey/bin/sbcl.exe make win-bundle
+      shell: msys2 {0}
+
+    - name: compress bundle
+      run: Compress-Archive -Path .\chrono-labyrinth -DestinationPath .\chrono-labyrinth-win
+
+    - name: upload release
+      uses: actions/upload-artifact@v3
+      with:
+        name: chrono-labyrinth-release-${{ matrix.os }}
+        path: chrono-labyrinth-win.zip

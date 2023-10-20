@@ -1,0 +1,77 @@
+#+title: Chrono Labyrinth
+#+author: Gleefre
+#+email: varedif.a.s@gmail.com
+
+#+description: This is a README file for the Chrono Labyrinth game
+#+language: en
+
+* Installation
+** From source
+*** Requirements
+    - Libraries (most of them are available from quicklisp)
+      - Depends on [[https://github.com/vydd/sketch][sketch]], [[https://github.com/Gleefre/sketch-utils][sketch-utils]], [[https://github.com/Gleefre/stopclock][stopclock]], [[https://alexandria.common-lisp.dev/][alexandria]], [[https://github.com/ruricolist/serapeum][serapeum]] and [[https://github.com/Shinmera/deploy/][deploy]].
+      - You will need to use ~gleefre/dev~ branch of my sketch's [[https://github.com/Gleefre/sketch][fork]].
+      - You will need to install [[https://github.com/Gleefre/sketch-utils][sketch-utils]] from source, while other libraries are available from [[https://www.quicklisp.org/beta/][quicklisp]].
+    - Foreign dependencies
+      - SDL2, SDL2 Image, SDL2 TTF
+        =sketch= relies on =SDL2= library which is a C library.
+        See [[https://github.com/vydd/sketch#foreign-dependencies][sketch's README]] for more details.
+**** Fetch non-quicklisp libraries
+     You can fetch all non-quicklisp libraries with git clone:
+     #+BEGIN_SRC bash
+     cd $HOME/quicklisp/local-projects/
+     git clone https://github.com/Gleefre/sketch -b gleefre/dev
+     git clone https://github.com/Gleefre/sketch-utils
+     #+END_SRC
+*** Running from source
+    To run this game you need to load the ~:chrono-labyrinth~ system:
+    #+BEGIN_SRC lisp
+    (ql:quickload :chrono-labyrinth)
+    #+END_SRC
+    Then you need to call the main function:
+    #+BEGIN_SRC lisp
+    (chrono-labyrinth:start)
+    #+END_SRC
+    To run the game from a script you might want to use the ~start-toplevel~ funtion:
+    #+BEGIN_SRC lisp
+    (chrono-labyrinth:start-toplevel)
+    #+END_SRC
+    ~start-toplevel~ will return only when you close the game.
+**** Supported implementations
+     sbcl, ccl, ecl.
+*** Building
+    You can build the game with make:
+    #+BEGIN_SRC bash
+    # Builds Chrono Labyrinth
+    make build
+    # Bundles executable and all needed resources to the chrono-labyrinth/ folder
+    make bundle
+    # For linux
+    # Adds run.sh script to the bundle and creates a zip archive
+    make lin-bundle
+    # For windows
+    # Adds run.bat script to the bundle
+    make win-bundle
+    #+END_SRC
+    You can also specify which lisp implementation to use with the ~LISP~ environment variable.
+    SBCL is used by default.
+    #+BEGIN_SRC bash
+    LISP=ccl make build
+    #+END_SRC
+**** Supported implementations
+     sbcl, ccl.
+* Screenshots
+* License
+   Copyright 2023 Gleefre, ...
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
