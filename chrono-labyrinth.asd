@@ -10,12 +10,17 @@
                "sketch" "sketch-utils"
                "stopclock"
                "alexandria" "serapeum"
-               "deploy")
+               "deploy"
+	       "cl-cffi-gtk"
+	       "bordeaux-threads"
+	       "swank"
+	       "gtk-demo")
 
   :pathname "src"
   :serial T
   :components ((:file "packages")
                (:file "specials")
+	       (:file "gtk")
                (:file "utils")
                (:file "music")
                (:file "gameplay")
