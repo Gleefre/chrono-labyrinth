@@ -11,10 +11,12 @@
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
-	       "cl-cffi-gtk"
+	       ;; "cl-cffi-gtk"
 	       "bordeaux-threads"
+	       "cl-gtk4"
 	       "swank"
-	       "gtk-demo")
+	       ;; "gtk-demo"
+	       )
 
   :pathname "src"
   :serial T
