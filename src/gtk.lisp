@@ -16,7 +16,7 @@
                        (declare (ignore context))
                        (when (sketch::env-initialized-p (slot-value stars 'sketch::%env))
                          (sketch::render stars))
-                       (gtk:widget-queue-draw area)))
+                       (gtk:idle-add (lambda () (gtk:widget-queue-draw area)))))
         (gtk:connect area "realize"
                      (lambda (area)
                        (gtk:gl-area-make-current area)
