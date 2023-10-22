@@ -7,26 +7,11 @@
     (setf (gtk:window-default-size window) '(600 800))
     (let ((box (gtk:make-box :orientation gtk:+orientation-vertical+
                              :spacing 4)))
-      (let ((area (gtk:make-gl-area))
-            (stars (make-instance 'sketch-examples:stars :no-window t)))
+      (let* ((sketch-area (make-sketch-area 'sketch-examples:stars))
+             (area (gl-area sketch-area)))
         (setf (gtk:widget-hexpand-p area) t
               (gtk:widget-vexpand-p area) t)
-        (gtk:connect area "render"
-                     (lambda (area context)
-                       (declare (ignore context))
-                       (when (sketch::env-initialized-p (slot-value stars 'sketch::%env))
-                         (sketch::render stars))
-                       (gtk:idle-add (lambda () (gtk:widget-queue-draw area)))))
-        (gtk:connect area "realize"
-                     (lambda (area)
-                       (gtk:gl-area-make-current area)
-                       (sketch::initialize-environment stars)
-                       (sketch::initialize-gl stars)))
-        (gtk:connect area "unrealize"
-                     (lambda (area)
-                       (declare (ignore area))
-                       (sketch::close-sketch stars)))
-	(gtk:box-append box area)
+        (gtk:box-append box area)
         (let ((button (gtk:make-button :label "Add")))
           (gtk:connect button "clicked" (lambda (button)
 					  (declare (ignore button))))
