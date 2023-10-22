@@ -22,6 +22,7 @@
   :serial T
   :components ((:file "packages")
                (:file "specials")
+               (:file "gtk-sketch-area")
 	       (:file "gtk")
                (:file "utils")
                (:file "music")
