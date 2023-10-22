@@ -7,7 +7,7 @@
 
   :depends-on ("uiop" "asdf"
                "sdl2"
-               "sketch" "sketch-utils"
+               "sketch" "sketch-utils" "sketch-examples"
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
