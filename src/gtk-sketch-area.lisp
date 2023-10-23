@@ -23,4 +23,10 @@
                  (lambda (area)
                    (declare (ignore area))
                    (sketch::close-sketch sketch)))
+    (gtk:connect area "resize"
+                 (lambda (area w h)
+                   (declare (ignore area))
+                   (setf (sketch:sketch-width sketch) w
+                         (sketch:sketch-height sketch) h)
+                   (kit.sdl2:window-event sketch :size-changed nil w h)))
     sketch-area))
