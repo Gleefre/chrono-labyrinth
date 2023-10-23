@@ -11,19 +11,19 @@
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
-	       ;; "cl-cffi-gtk"
-	       "bordeaux-threads"
-	       "cl-gtk4"
-	       "swank"
-	       ;; "gtk-demo"
-	       )
+               ;; "cl-cffi-gtk"
+               "bordeaux-threads"
+               "cl-gtk4"
+               "swank"
+               ;; "gtk-demo"
+               )
 
   :pathname "src"
   :serial T
   :components ((:file "packages")
                (:file "specials")
                (:file "gtk-sketch-area")
-	       (:file "utils")
+               (:file "utils")
                (:file "gtk")
                (:file "music")
                (:file "gameplay")
