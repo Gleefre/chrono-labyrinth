@@ -9,8 +9,9 @@
   (unless rsc
     (setf rsc (s:load-resource
                (data-path "textures/sprite_sheet.png"))))
-  (s:image (s:crop rsc 32 32 32 32) 10 10)
-  (s:image (s:crop rsc 32 0 32 32) 42 10))
+  (s:with-pen (s:make-pen)
+    (s:image (s:crop rsc 32 32 32 32) 10 10)
+    (s:image (s:crop rsc 32 0 32 32) 42 10)))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
