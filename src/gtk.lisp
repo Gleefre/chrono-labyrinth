@@ -29,7 +29,7 @@
           (gtk:connect button "clicked" (lambda (button)
                                           (declare (ignore button))
                                           (gtk:window-destroy window)
-                                          #+sbcl (sb-ext:exit)))
+                                          (uiop:quit)))
           (setf (gtk:widget-hexpand-p button) t
                 (gtk:widget-vexpand-p button) t)
           (gtk:box-append box button)))
