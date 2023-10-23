@@ -13,6 +13,7 @@
   (s:image (s:crop rsc 32 0 32 32) 42 10))
 
 (defparameter *sketch-name-for-area* 'tile-test)
+(defparameter *quit-on-close* t)
 
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
@@ -29,7 +30,8 @@
           (gtk:connect button "clicked" (lambda (button)
                                           (declare (ignore button))
                                           (gtk:window-destroy window)
-                                          (uiop:quit)))
+                                          (when *quit-on-close*
+                                            (uiop:quit))))
           (setf (gtk:widget-hexpand-p button) t
                 (gtk:widget-vexpand-p button) t)
           (gtk:box-append box button)))
