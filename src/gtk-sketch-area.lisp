@@ -15,7 +15,7 @@
                    (gtk:idle-add (lambda () (gtk:widget-queue-draw area)))))
     (gtk:connect area "realize"
                  (lambda (area)
-                   (sketch::initialize-sketch)
+		   (sketch::initialize-sketch)
                    (gtk:gl-area-make-current area)
                    (sketch::initialize-environment sketch)
                    (sketch::initialize-gl sketch)))
