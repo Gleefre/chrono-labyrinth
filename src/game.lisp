@@ -7,7 +7,7 @@
         (*game-clock* clock)
         (*game-window* s::*sketch*))
     (draw-game s:width s:height)))
-#+nil
+
 (s:define-start-function (start) game-window
                          (:resizable t :width 800 :height 500))
 
