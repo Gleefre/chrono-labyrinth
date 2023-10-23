@@ -62,14 +62,14 @@
                      (kit.sdl2:keyboard-event sketch :keydown nil
                                               (prog1 (gethash keycode pressed)
                                                 (setf (gethash keycode pressed) t))
-                                              (make-keysym keyval keycode state))
+                                              (%%make-keysym keyval keycode state))
                      ;; FIXME: Use imcontext?
                      (kit.sdl2:textinput-event sketch nil "")))
       (gtk:connect controller "key-released"
                    (lambda (controller keyval keycode state)
                      (declare (ignore controller))
                      (setf (gethash keycode pressed) nil)
-                     (kit.sdl2:keyboard-event sketch :keydown nil nil (make-keysym keyval keycode state))))
+                     (kit.sdl2:keyboard-event sketch :keydown nil nil (%%make-keysym keyval keycode state))))
       (gtk:widget-add-controller area controller))
     (let ((controller (gtk:make-event-controller-motion)))
       (gtk:connect controller "enter"
