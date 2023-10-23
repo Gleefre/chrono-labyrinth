@@ -1,5 +1,7 @@
 (in-package #:chrono-labyrinth)
 
+(defparameter *sketch-name-for-area* 'game-window)
+
 (gtk:define-application (:name simple-counter
 			 :id "org.bohonghuang.gtk4-example.simple-counter")
   (gtk:define-main-window (window (gtk:make-application-window :application gtk:*application*))
@@ -7,7 +9,7 @@
     (setf (gtk:window-default-size window) '(600 800))
     (let ((box (gtk:make-box :orientation gtk:+orientation-vertical+
                              :spacing 4)))
-      (let* ((sketch-area (make-sketch-area 'sketch-examples:stars))
+      (let* ((sketch-area (make-sketch-area *sketch-name-for-area*))
              (area (gl-area sketch-area)))
         (setf (gtk:widget-hexpand-p area) t
               (gtk:widget-vexpand-p area) t)
