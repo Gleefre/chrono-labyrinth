@@ -1,23 +1,59 @@
 (in-package #:chrono-labyrinth)
 
 (defconstant +tile-side+ 48)
+(defconstant +tile-count+ 29)
+
+(defclass tile ()
+  ((id :accessor id :initarg :id)))
+
+(defparameter +tiles-count-v+ 100)
+(defparameter +tiles-count-h+ 100)
+(defparameter +tiles-per-row+ 10)
+
+(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+)))
+
+;; TODO: rename to game/load-tiles
+(defun load-tiles2 ()
+  (loop for x from 0 below +tiles-count-h+
+	do (loop for y from 0 below +tiles-count-v+
+		 do (setf (aref *tiles* x y) (make-instance 'tile :id 3)))))
+
+(defun draw-tile (tile-id->texture tile x y)
+  (s:image (gethash (id tile) tile-id->texture) x y))
 
 (s:defsketch tile-test
     ((s:title "tile")
      ;; NOTE: Because this code is executed before sketch initialization
      ;; there is a memory fault when the sdl2-image:load-image and the gl:gen-texture
      ;; go one after another.
-     (rsc nil))
+     (rsc nil)
+     (tile-id->texture nil))
+
   (unless rsc
     (setf rsc (s:load-resource
-               (data-path "textures/tiles.png"))))
+               (data-path "textures/tiles.png")))
+    (setf tile-id->texture (make-hash-table))
+    (dotimes (id +tile-count+)
+      (multiple-value-bind (row column) (floor id +tiles-per-row+)
+	(let ((source-x (* column +tile-side+))
+	      (source-y (* row +tile-side+)))
+	  (setf (gethash id tile-id->texture)
+		(s:crop rsc
+			source-x source-y
+			+tile-side+ +tile-side+))))))
+
   (s:with-pen (s:make-pen)
-    (s:image (s:crop rsc +tile-side+ +tile-side+ +tile-side+ +tile-side+) 10 10)
-    (s:image (s:crop rsc +tile-side+ 0 +tile-side+ +tile-side+) (+ 20 +tile-side+) 10)))
+    (loop for x from 0 below +tiles-count-h+
+	  do (loop for y from 0 below +tiles-count-v+
+		   do (draw-tile tile-id->texture
+				 (aref *tiles* x y)
+				 (* x +tile-side+)
+				 (* y +tile-side+))))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
 
+;; TODO: rename to editor/load-tiles.
 (defun load-tiles (list-box)
   (let* ((tiles (gdk-pixbuf2:make-pixbuf
 		 :filename (data-path "textures/tiles.png")))
@@ -54,6 +90,9 @@
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
   (gtk:define-main-window (window (gtk:make-application-window :application gtk:*application*))
+
+    (load-tiles2)
+
     (setf (gtk:window-title window) "Chrono Maze")
     (setf (gtk:window-default-size window) '(900 800))
 

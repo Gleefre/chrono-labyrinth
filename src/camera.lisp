@@ -4,21 +4,15 @@
   ((x :accessor x :initarg :x :initform 0.0 :type float)
    (y :accessor y :initarg :y :initform 0.0 :type float)))
 
-(defstruct size
-  (width 0.0 :type float)
-  (height 0.0 :type float))
+(defclass size ()
+  ((width :accessor width :initarg :width :initform 0.0 :type float)
+   (height :accessor height :initarg :height :initform 0.0 :type float)))
 
-(defstruct rectangle
-  (x 0.0 :type float)
-  (y 0.0 :type float)
-  (width 0.0 :type float)
-  (height 0.0 :type float))
-
-(defmethod foo ((v point))
-  (print (point-x v)))
-
-(defmethod foo ((v rectangle))
-  (print (x v)))
+(defclass rectangle ()
+  ((x :accessor x :initarg :x :initform 0.0 :type float)
+   (y :accessor y :initarg :y :initform 0.0 :type float)
+   (width :accessor width :initarg :width :initform 0.0 :type float)
+   (height :accessor height :initarg :height :initform 0.0 :type float)))
 
 (defparameter *camera-position* (make-point))
 (defparameter *camera-view-port-size* (make-size))
