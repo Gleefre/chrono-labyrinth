@@ -17,7 +17,7 @@
   (plus-c:c-let ((ks sdl2-ffi:sdl-keysym :calloc t))
     (setf (ks :scancode) (%%make-scancode gtk-keycode)
           (ks :sym) (%%make-value gtk-keyval)
-          (ks :mod) (%%make-mod gtk-state))
+          (ks :mod) (%%make-mode gtk-state))
     (ks plus-c:&)))
 
 (defstruct (sketch-area (:conc-name nil) (:constructor %make-sketch-area))
