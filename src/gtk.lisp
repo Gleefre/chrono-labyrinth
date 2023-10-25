@@ -11,6 +11,7 @@
 (defparameter +tiles-per-row+ 10)
 
 (defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+)))
+(defparameter *editor-tile* (make-instance 'tile :id 0))
 
 ;; TODO: rename to game/load-tiles
 (defun load-tiles2 ()
@@ -49,6 +50,16 @@
 				 (aref *tiles* x y)
 				 (* x +tile-side+)
 				 (* y +tile-side+))))))
+
+(defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
+  (declare (ignore ts))
+  (when (and (eq :mousebuttondown st)
+             (eq but 1))
+    (let ((x (floor x +tile-side+))
+          (y (floor y +tile-side+)))
+      (when (and (<= 0 x (1- +tiles-count-h+))
+                 (<= 0 y (1- +tiles-count-v+)))
+        (setf (aref *tiles* x y) *editor-tile*)))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
@@ -102,6 +113,10 @@
       (let ((scrolled-window (gtk:make-scrolled-window))
 	    (list-box (gtk:make-list-box)))
 	(load-tiles list-box)
+        (gtk:connect list-box "row-activated"
+                     (lambda (self row)
+                       (setf *editor-tile*
+                             (make-instance 'tile :id (gtk:list-box-row-index row)))))
 	(setf (gtk:scrolled-window-child scrolled-window) list-box)
 
 	(setf (gtk:widget-hexpand-p scrolled-window) t)
