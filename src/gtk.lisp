@@ -3,63 +3,93 @@
 (defconstant +tile-side+ 48)
 (defconstant +tile-count+ 29)
 
-(defclass tile ()
-  ((id :accessor id :initarg :id)))
-
 (defparameter +tiles-count-v+ 15)
 (defparameter +tiles-count-h+ 15)
 (defparameter +tiles-per-row+ 10)
 
-(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+)))
-(defparameter *editor-tile* (make-instance 'tile :id 0))
+(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 3))
+(defparameter *editor-tile* 0)
 
-;; TODO: rename to game/load-tiles
-(defun load-tiles2 ()
-  (loop for x from 0 below +tiles-count-h+
-	do (loop for y from 0 below +tiles-count-v+
-		 do (setf (aref *tiles* x y) (make-instance 'tile :id 3)))))
+(defun draw-tile (tile-id &optional color)
+  (multiple-value-bind (y x) (floor tile-id +tiles-per-row+)
+    (s:image (s:colored-image
+              (s:load-resource
+               (data-path "textures/tiles.png")
+               :x (* x +tile-side+)
+               :y (* y +tile-side+)
+               :w +tile-side+
+               :h +tile-side+)
+              color)
+             0
+             0)))
 
-(defun draw-tile (tile-id->texture tile x y)
-  (s:image (gethash (id tile) tile-id->texture) x y))
+(defun choosed-area (choose-xy x y)
+  (if choose-xy
+      (destructuring-bind (x* y*) choose-xy
+        (when (> x x*) (rotatef x x*))
+        (when (> y y*) (rotatef y y*))
+        (let ((rect (list x y (- x* x) (- y* y))))
+          (let ((x  (floor x  +tile-side+))
+                (y  (floor y  +tile-side+))
+                (x* (floor x* +tile-side+))
+                (y* (floor y* +tile-side+)))
+            (setf x  (alexandria:clamp x  0 (1- +tiles-count-h+))
+                  x* (alexandria:clamp x* 0 (1- +tiles-count-h+))
+                  y  (alexandria:clamp y  0 (1- +tiles-count-v+))
+                  y* (alexandria:clamp y* 0 (1- +tiles-count-v+)))
+            (list (list x x* y y*)
+                  rect))))
+      (list (list -1 -1 -1 -1)
+            (list -1 -1 -1 -1))))
 
-(s:defsketch tile-test
-    ((s:title "tile")
-     ;; NOTE: Because this code is executed before sketch initialization
-     ;; there is a memory fault when the sdl2-image:load-image and the gl:gen-texture
-     ;; go one after another.
-     (rsc nil)
-     (tile-id->texture nil))
-
-  (unless rsc
-    (setf rsc (s:load-resource
-               (data-path "textures/tiles.png")))
-    (setf tile-id->texture (make-hash-table))
-    (dotimes (id +tile-count+)
-      (multiple-value-bind (row column) (floor id +tiles-per-row+)
-	(let ((source-x (* column +tile-side+))
-	      (source-y (* row +tile-side+)))
-	  (setf (gethash id tile-id->texture)
-		(s:crop rsc
-			source-x source-y
-			+tile-side+ +tile-side+))))))
-
-  (s:with-pen (s:make-pen)
-    (loop for x from 0 below +tiles-count-h+
-	  do (loop for y from 0 below +tiles-count-v+
-		   do (draw-tile tile-id->texture
-				 (aref *tiles* x y)
-				 (* x +tile-side+)
-				 (* y +tile-side+))))))
+(s:defsketch tile-test ((s:title "tile")
+                        (choose-xy nil))
+  (s:background s:+black+)
+  (s+:with-fit ((* +tiles-count-h+ +tile-side+)
+                (* +tiles-count-v+ +tile-side+)
+                s:width s:height)
+    (s:with-pen (s:make-pen)
+      (destructuring-bind ((x x+ y y+) (x= y= w= h=))
+          (apply #'choosed-area choose-xy
+                 (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
+                               (* +tiles-count-h+ +tile-side+)
+                               (* +tiles-count-v+ +tile-side+)
+                               s:width s:height))
+        (loop for xt from 0 below +tiles-count-h+
+              do (loop for yt from 0 below +tiles-count-v+
+                       do (s:with-translate ((* xt +tile-side+) (* yt +tile-side+))
+                            (if (and (<= x xt x+)
+                                     (<= y yt y+))
+                                (draw-tile *editor-tile* (s:rgb 1 1 1 0.9))
+                                (draw-tile (aref *tiles* xt yt))))))
+        (s+:with-color (s:+red+ :stroke)
+          (s:rect x= y= w= h=))))))
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
-  (when (and (eq :mousebuttondown st)
-             (eq but 1))
-    (let ((x (floor x +tile-side+))
-          (y (floor y +tile-side+)))
-      (when (and (<= 0 x (1- +tiles-count-h+))
-                 (<= 0 y (1- +tiles-count-v+)))
-        (setf (aref *tiles* x y) *editor-tile*)))))
+  (destructuring-bind (x y) (s+:fit-point x y
+                                          (* +tiles-count-h+ +tile-side+) (* +tiles-count-v+ +tile-side+)
+                                          (s:sketch-width sketch) (s:sketch-height sketch))
+    (when (eq but 1)
+      (case st
+        (:mousebuttondown
+         (setf (tile-test-choose-xy sketch) (list x y)))
+        (:mousebuttonup
+         (destructuring-bind (x* y*) (tile-test-choose-xy sketch)
+           (setf (tile-test-choose-xy sketch) nil)
+           (when (> x x*) (rotatef x x*))
+           (when (> y y*) (rotatef y y*))
+           (let ((x  (floor x  +tile-side+))
+                 (y  (floor y  +tile-side+))
+                 (x* (floor x* +tile-side+))
+                 (y* (floor y* +tile-side+)))
+             (setf x  (alexandria:clamp x  0 (1- +tiles-count-h+))
+                   x* (alexandria:clamp x* 0 (1- +tiles-count-h+))
+                   y  (alexandria:clamp y  0 (1- +tiles-count-v+))
+                   y* (alexandria:clamp y* 0 (1- +tiles-count-v+)))
+             (loop for x from x to x*
+                   do (loop for y from y to y*
+                            do (setf (aref *tiles* x y) *editor-tile*))))))))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
@@ -101,22 +131,17 @@
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
   (gtk:define-main-window (window (gtk:make-application-window :application gtk:*application*))
-
-    (load-tiles2)
-
     (setf (gtk:window-title window) "Chrono Maze")
     (setf (gtk:window-default-size window) '(900 800))
 
     (let ((box (gtk:make-box :orientation gtk:+orientation-horizontal+
                              :spacing 4)))
-
       (let ((scrolled-window (gtk:make-scrolled-window))
 	    (list-box (gtk:make-list-box)))
 	(load-tiles list-box)
         (gtk:connect list-box "row-activated"
                      (lambda (self row)
-                       (setf *editor-tile*
-                             (make-instance 'tile :id (gtk:list-box-row-index row)))))
+                       (setf *editor-tile* (gtk:list-box-row-index row))))
 	(setf (gtk:scrolled-window-child scrolled-window) list-box)
 
 	(setf (gtk:widget-hexpand-p scrolled-window) t)
