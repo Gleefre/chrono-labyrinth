@@ -22,6 +22,7 @@
                (:file "gtk-sketch-area")
                (:file "utils")
                (:file "gtk")
+               (:file "character")
                (:file "music")
                (:file "gameplay")
                (:file "draw")
