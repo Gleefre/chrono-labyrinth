@@ -6,8 +6,8 @@
 (defclass tile ()
   ((id :accessor id :initarg :id)))
 
-(defparameter +tiles-count-v+ 100)
-(defparameter +tiles-count-h+ 100)
+(defparameter +tiles-count-v+ 15)
+(defparameter +tiles-count-h+ 15)
 (defparameter +tiles-per-row+ 10)
 
 (defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+)))
