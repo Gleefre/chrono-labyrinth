@@ -1,14 +1,17 @@
 (in-package #:chrono-labyrinth)
 
 (defun %%make-scancode (gtk-keycode)
+  (declare (ignore gtk-keycode))
   ;; FIXME
   (sdl2:scancode-key-to-value :scancode-unknown))
 
 (defun %%make-value (gtk-keyval)
+  (declare (ignore gtk-keyval))
   ;; FIXME
   (autowrap:enum-value 'sdl2-ffi:sdl-key-code :unknown))
 
 (defun %%make-mode (gtk-state)
+  (declare (ignore gtk-state))
   ;; FIXME
   0
   )

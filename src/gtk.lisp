@@ -141,6 +141,7 @@
 	(load-tiles list-box)
         (gtk:connect list-box "row-activated"
                      (lambda (self row)
+                       (declare (ignore self))
                        (setf *editor-tile* (gtk:list-box-row-index row))))
 	(setf (gtk:scrolled-window-child scrolled-window) list-box)
 
