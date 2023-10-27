@@ -21,6 +21,7 @@
                (:file "specials")
                (:file "gtk-sketch-area")
                (:file "utils")
+	       (:file "camera")
                (:file "gtk")
                (:file "music")
                (:file "gameplay")
