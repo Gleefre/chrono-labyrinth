@@ -1,8 +1,5 @@
 (in-package #:chrono-labyrinth)
 
-(defun clamp (lower-bound value upper-bound)
-  (max lower-bound (min value upper-bound)))
-
 (defclass point ()
   ((x :accessor x :initarg :x :initform 0.0 :type float)
    (y :accessor y :initarg :y :initform 0.0 :type float)))
@@ -105,14 +102,14 @@
 
 (defun (setf camera-position) (value)
   (setf *camera-position*
-	(make-point :x (clamp (x (camera-world-rectangle))
-			      (x value)
-			      (- (width (camera-world-rectangle))
-				 (camera-view-port-width)))
-		    :y (clamp (y (camera-world-rectangle))
-			      (y value)
-			      (- (height (camera-world-rectangle))
-				 (camera-view-port-height))))))
+	(make-point :x (a:clamp (x value)
+			        (x (camera-world-rectangle))
+			        (- (width (camera-world-rectangle))
+				   (camera-view-port-width)))
+		    :y (a:clamp (y value)
+			        (y (camera-world-rectangle))
+			        (- (height (camera-world-rectangle))
+				   (camera-view-port-height))))))
 
 (defun camera-move (offset)
   (setf (camera-position) (point/add (camera-position) offset)))
