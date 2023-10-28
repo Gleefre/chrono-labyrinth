@@ -30,22 +30,26 @@
 (defclass fire (static) ())
 
 (defclass world ()
-  ((map     :initform (make-hash-table :test 'equal) :accessor world-map)
-   (objects :initform (list)                         :accessor world-objects)
-   (table   :initform (make-hash-table :test 'eq)    :accessor world-table)))
+  ((map       :initform (make-hash-table :test 'equal) :accessor world-map)
+   (time-flow :initform :forwards                      :accessor world-time-flow)
+   (objects   :initform (list)                         :accessor world-objects)
+   (table     :initform (make-hash-table :test 'eq)    :accessor world-table)))
 
 ;;; Interacting with world
 
 (defun object-by-name (name &optional (world *world*))
   (gethash name (world-table world)))
 
+(defun objects-at (position &optional (world *world*))
+  (gethash position (world-map world)))
+
 (defun movable-object-at (position &optional (world *world*))
   (find-if (lambda (object) (typep object 'movable))
-           (gethash position (world-map world))))
+           (objects-at position world)))
 
 (defun statics-at (position &optional (world *world*))
   (remove-if-not (lambda (object) (typep object 'static))
-                 (gethash position (world-map world))))
+                 (objects-at position world)))
 
 (defmethod add-to-world ((object game-object) &optional (world *world*))
   (alexandria:when-let ((pos (object-position object)))
