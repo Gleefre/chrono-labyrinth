@@ -92,3 +92,14 @@
       (let ((next-position (in-direction position direction)))
         (alexandria:removef (gethash position (world-map world)) object)
         (push object (gethash next-position (world-map world)))))))
+
+(defmethod remove-object ((object game-object) &optional (world *world*))
+  (alexandria:when-let ((pos (object-position object)))
+    (alexandria:removef (gethash pos (world-map world)) object)))
+
+(defmethod remove-object ((object named-object) &optional (world *world*))
+  (remhash (object-name object) (world-table world)))
+
+(defun cleanup-world (&optional (world *world*))
+  (setf (world-objects world)
+        (remove-if-not #'object-position (world-objects world))))

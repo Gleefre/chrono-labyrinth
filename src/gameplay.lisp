@@ -34,10 +34,7 @@
         (move object (action object time-flow)))
       (dolist (object (world-objects world))
         (when (deadp object)
-          (alexandria:removef (gethash (object-position object) (world-map world)) object)
-          (when (typep object 'named-object)
-            (remhash (object-name object) (world-table world)))))
-      (setf (world-objects world)
-            (remove-if-not #'object-position (world-objects world))))))
+          (remove-object object)))
+      (cleanup-world))))
 
 (defun make-game ())
