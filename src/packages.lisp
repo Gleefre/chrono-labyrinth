@@ -3,4 +3,5 @@
   (:export #:start #:start-toplevel)
   (:local-nicknames (#:s  #:sketch)
                     (#:s+ #:sketch-utils)
-                    (#:sc #:stopclock)))
+                    (#:sc #:stopclock)
+                    (#:a  #:alexandria)))

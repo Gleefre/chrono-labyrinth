@@ -9,7 +9,7 @@
        ,@(loop for (name args) in methods
                for cache-table-var = (gensym (with-standard-io-syntax
                                                (format nil "%*~A-CACHE*" name)))
-               for key = `(list* ,@(mapcar #'car (mapcar #'alexandria:ensure-list args)))
+               for key = `(list* ,@(mapcar #'car (mapcar #'a:ensure-list args)))
                do (push cache-table-var cache-vars)
                collect `(defvar ,cache-table-var)
                collect `(defmethod ,name :around ,args
@@ -46,7 +46,7 @@
   (defvar %*directionp-cache*)
   (defparameter %*cache-direction* nil)
 
-  (macrolet ((define-cache-method (name args &aux (special-var (alexandria:symbolicate '#:%* name '#:-cache*)))
+  (macrolet ((define-cache-method (name args &aux (special-var (a:symbolicate '#:%* name '#:-cache*)))
                `(defmethod ,name :around ((object game-object) ,@args)
                   (if %*cache-direction*
                       (let ((key (list* ,@args object)))

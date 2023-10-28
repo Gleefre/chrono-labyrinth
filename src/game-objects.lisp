@@ -44,15 +44,15 @@
   (gethash position (world-map world)))
 
 (defun movable-object-at (position &optional (world *world*))
-  (find-if (alexandria:rcurry #'typep 'movable)
+  (find-if (a:rcurry #'typep 'movable)
            (objects-at position world)))
 
 (defun statics-at (position &optional (world *world*))
-  (remove-if-not (alexandria:rcurry #'typep 'static)
+  (remove-if-not (a:rcurry #'typep 'static)
                  (objects-at position world)))
 
 (defmethod add-to-world ((object game-object) &optional (world *world*))
-  (alexandria:when-let ((pos (object-position object)))
+  (a:when-let ((pos (object-position object)))
     (push object (gethash pos (world-map world))))
   (push object (world-objects world)))
 
@@ -90,12 +90,12 @@
   (with-slots (position) object
     (when (and position (not (eq :stay direction)))
       (let ((next-position (in-direction position direction)))
-        (alexandria:removef (gethash position (world-map world)) object)
+        (a:removef (gethash position (world-map world)) object)
         (push object (gethash next-position (world-map world)))))))
 
 (defmethod remove-object ((object game-object) &optional (world *world*))
-  (alexandria:when-let ((pos (object-position object)))
-    (alexandria:removef (gethash pos (world-map world)) object)))
+  (a:when-let ((pos (object-position object)))
+    (a:removef (gethash pos (world-map world)) object)))
 
 (defmethod remove-object ((object named-object) &optional (world *world*))
   (remhash (object-name object) (world-table world)))

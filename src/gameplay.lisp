@@ -11,11 +11,11 @@
 (defmethod deadp ((game-object game-object)) nil)
 
 (defmethod deadp ((box box))
-  (some (alexandria:rcurry #'typep '(or fire game-block box player))
+  (some (a:rcurry #'typep '(or fire game-block box player))
         (objects-at (object-position box))))
 
 (defmethod deadp ((player player))
-  (some (alexandria:rcurry #'typep '(or fire game-block))
+  (some (a:rcurry #'typep '(or fire game-block))
         (objects-at (object-position player))))
 
 (defun update-world (world &optional (time-flow (world-time-flow world) time-flow-p))
