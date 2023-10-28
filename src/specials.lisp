@@ -3,3 +3,5 @@
 (defvar *game*)
 (defvar *game-clock*)
 (defvar *game-window*)
+
+(defvar *world*)

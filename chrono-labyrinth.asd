@@ -26,6 +26,7 @@
                (:file "gtk")
                (:file "character")
                (:file "music")
+               (:file "game-objects")
                (:file "gameplay")
                (:file "draw")
                (:file "game"))
