@@ -21,6 +21,7 @@
                (:file "specials")
                (:file "gtk-sketch-area")
                (:file "utils")
+               (:file "caching-methods")
 	       (:file "camera")
                (:file "gtk")
                (:file "character")
