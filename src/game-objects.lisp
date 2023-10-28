@@ -44,11 +44,11 @@
   (gethash position (world-map world)))
 
 (defun movable-object-at (position &optional (world *world*))
-  (find-if (lambda (object) (typep object 'movable))
+  (find-if (alexandria:rcurry #'typep 'movable)
            (objects-at position world)))
 
 (defun statics-at (position &optional (world *world*))
-  (remove-if-not (lambda (object) (typep object 'static))
+  (remove-if-not (alexandria:rcurry #'typep 'static)
                  (objects-at position world)))
 
 (defmethod add-to-world ((object game-object) &optional (world *world*))
