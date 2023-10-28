@@ -43,6 +43,10 @@
   (find-if (lambda (object) (typep object 'movable))
            (gethash position (world-map world))))
 
+(defun statics-at (position &optional (world *world*))
+  (remove-if-not (lambda (object) (typep object 'static))
+                 (gethash position (world-map world))))
+
 (defmethod add-to-world ((object game-object) &optional (world *world*))
   (alexandria:when-let ((pos (object-position object)))
     (push object (gethash pos (world-map world))))

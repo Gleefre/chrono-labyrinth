@@ -27,6 +27,7 @@
                (:file "character")
                (:file "music")
                (:file "game-objects")
+               (:file "game-physics")
                (:file "gameplay")
                (:file "draw")
                (:file "game"))
