@@ -66,8 +66,8 @@
     (gtk:connect area "resize"
                  (lambda (area w h)
                    (declare (ignore area))
-		   (setf (camera-view-port-width) w)
-		   (setf (camera-view-port-height) h)
+                   (setf (camera-view-port-width) w)
+                   (setf (camera-view-port-height) h)
                    (setf (sketch:sketch-width sketch) w
                          (sketch:sketch-height sketch) h)
                    (kit.sdl2:window-event sketch :size-changed nil w h)))
@@ -106,7 +106,7 @@
       (gtk:connect controller "pressed"
                    (lambda (controller num x y)
                      (declare (ignore num))
-		     (gtk:widget-grab-focus area)
+                     (gtk:widget-grab-focus area)
                      (let ((button (gtk:gesture-single-current-button controller)))
                        (setf (ldb (byte 1 (1- button)) bmask) 1)
                        (kit.sdl2:mousebutton-event sketch :mousebuttondown nil button x y))))

@@ -14,13 +14,13 @@
 (defun draw-tile (tile-id point &optional color)
   (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
     (s:image (s:crop (s:load-resource
-		      (data-path "textures/tiles-min.png"))
-		     (* sx +tile-side+)
-		     (* sy +tile-side+)
-		     +tile-side+
-		     +tile-side+)
-	     (x point)
-	     (y point))))
+                      (data-path "textures/tiles-min.png"))
+                     (* sx +tile-side+)
+                     (* sy +tile-side+)
+                     +tile-side+
+                     +tile-side+)
+             (x point)
+             (y point))))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
@@ -46,8 +46,8 @@
                                           800 800
                                           width height)
     (let* ((world-point (camera-screen-to-world (make-point :x x :y y)))
-	   (x (x world-point))
-	   (y (y world-point)))
+           (x (x world-point))
+           (y (y world-point)))
       (list x y))))
 
 (defparameter *current-layer* 1)
@@ -56,13 +56,13 @@
   (loop for xt from 0 below +tiles-count-h+
         do (loop for yt from 0 below +tiles-count-v+
                  do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
-								     :y (* yt +tile-side+)
-								     :width +tile-side+
-								     :height +tile-side+))
-		      (draw-tile (aref layer xt yt)
-				 (camera-world-to-screen
-				  (make-point :x (* xt +tile-side+)
-					      :y (* yt +tile-side+))))))))
+                                                                     :y (* yt +tile-side+)
+                                                                     :width +tile-side+
+                                                                     :height +tile-side+))
+                      (draw-tile (aref layer xt yt)
+                                 (camera-world-to-screen
+                                  (make-point :x (* xt +tile-side+)
+                                              :y (* yt +tile-side+))))))))
 
 (defun draw-all-layers ()
   (draw-layer *layer-1*)
@@ -74,31 +74,31 @@
   (s+:with-fit (800 800 s:width s:height)
     (s:with-pen (s:make-pen)
       (if (zerop *current-layer*)
-	  (draw-all-layers)
-	  (destructuring-bind ((x x+ y y+) (x= y= w= h=))
+          (draw-all-layers)
+          (destructuring-bind ((x x+ y y+) (x= y= w= h=))
               (apply #'choosed-area choose-xy (screen->world (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
-							     s:width s:height))
-	    (let ((layer (ecase *current-layer*
-			   (1 *layer-1*)
-			   (2 *layer-2*))))
-	      (loop for xt from 0 below +tiles-count-h+
-		    do (loop for yt from 0 below +tiles-count-v+
-			     do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
-										 :y (* yt +tile-side+)
-										 :width +tile-side+
-										 :height +tile-side+))
-				  (if (and (<= x xt x+)
-					   (<= y yt y+))
-				      (draw-tile *editor-tile*
-						 (camera-world-to-screen
-						  (make-point :x (* xt +tile-side+)
-							      :y (* yt +tile-side+)))
-						 (s:rgb 1 1 1 0.9))
-				      (draw-tile (aref layer xt yt)
-						 (camera-world-to-screen
-						  (make-point :x (* xt +tile-side+)
-							      :y (* yt +tile-side+)))))))))
-	    (s+:with-color (s:+red+ :stroke)
+                                                             s:width s:height))
+            (let ((layer (ecase *current-layer*
+                           (1 *layer-1*)
+                           (2 *layer-2*))))
+              (loop for xt from 0 below +tiles-count-h+
+                    do (loop for yt from 0 below +tiles-count-v+
+                             do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
+                                                                                 :y (* yt +tile-side+)
+                                                                                 :width +tile-side+
+                                                                                 :height +tile-side+))
+                                  (if (and (<= x xt x+)
+                                           (<= y yt y+))
+                                      (draw-tile *editor-tile*
+                                                 (camera-world-to-screen
+                                                  (make-point :x (* xt +tile-side+)
+                                                              :y (* yt +tile-side+)))
+                                                 (s:rgb 1 1 1 0.9))
+                                      (draw-tile (aref layer xt yt)
+                                                 (camera-world-to-screen
+                                                  (make-point :x (* xt +tile-side+)
+                                                              :y (* yt +tile-side+)))))))))
+            (s+:with-color (s:+red+ :stroke)
               (s:rect x= y= w= h=)))))))
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
@@ -121,9 +121,9 @@
                    x* (a:clamp x* 0 (1- +tiles-count-h+))
                    y  (a:clamp y  0 (1- +tiles-count-v+))
                    y* (a:clamp y* 0 (1- +tiles-count-v+)))
-	     (let ((layer (ecase *current-layer*
-			    (1 *layer-1*)
-			    (2 *layer-2*))))
+             (let ((layer (ecase *current-layer*
+                            (1 *layer-1*)
+                            (2 *layer-2*))))
                (loop for x from x to x*
                      do (loop for y from y to y*
                               do (setf (aref layer x y) *editor-tile*)))))))))))
@@ -149,36 +149,36 @@
 ;; TODO: rename to editor/load-tiles.
 (defun load-tiles (list-box)
   (let* ((tiles (gdk-pixbuf2:make-pixbuf
-		 :filename (data-path "textures/tiles-min.png")))
-	 (width (gdk-pixbuf2:pixbuf-width tiles))
-	 (height (gdk-pixbuf2:pixbuf-height tiles))
-	 (tile-count 0))
+                 :filename (data-path "textures/tiles-min.png")))
+         (width (gdk-pixbuf2:pixbuf-width tiles))
+         (height (gdk-pixbuf2:pixbuf-height tiles))
+         (tile-count 0))
     (dotimes (y (/ height +tile-side+))
       (dotimes (x (/ width +tile-side+))
-	(when (< tile-count +tile-count+)
-	  (let ((image (gtk:make-image
-			:pixbuf (gdk-pixbuf2:pixbuf-new-subpixbuf
-				 tiles
-				 (* x +tile-side+)
-				 (* y +tile-side+)
-				 +tile-side+
-				 +tile-side+))))
-	    (let ((box (gtk:make-box :orientation gtk:+orientation-vertical+
-				     :spacing 5))
-		  (label (gtk:make-label :str (case tile-count
-						(0 "Empty : 0")
-						(1 "White : 1")
-						(t (format nil "~a" tile-count))))))
-	      (gtk:box-append box image)
-	      (gtk:box-append box label)
+        (when (< tile-count +tile-count+)
+          (let ((image (gtk:make-image
+                        :pixbuf (gdk-pixbuf2:pixbuf-new-subpixbuf
+                                 tiles
+                                 (* x +tile-side+)
+                                 (* y +tile-side+)
+                                 +tile-side+
+                                 +tile-side+))))
+            (let ((box (gtk:make-box :orientation gtk:+orientation-vertical+
+                                     :spacing 5))
+                  (label (gtk:make-label :str (case tile-count
+                                                (0 "Empty : 0")
+                                                (1 "White : 1")
+                                                (t (format nil "~a" tile-count))))))
+              (gtk:box-append box image)
+              (gtk:box-append box label)
 
-	      (setf (gtk:widget-margin-start box) 5)
-	      (setf (gtk:widget-margin-top box) 5)
-	      (setf (gtk:widget-margin-end box) 5)
-	      (setf (gtk:widget-margin-bottom box) 5)
+              (setf (gtk:widget-margin-start box) 5)
+              (setf (gtk:widget-margin-top box) 5)
+              (setf (gtk:widget-margin-end box) 5)
+              (setf (gtk:widget-margin-bottom box) 5)
 
-	      (gtk:list-box-insert list-box box tile-count)
-	      (incf tile-count))))))))
+              (gtk:list-box-insert list-box box tile-count)
+              (incf tile-count))))))))
 
 #+darwin
 (defmethod kit.sdl2:mousebutton-event :around ((sketch sketch::sketch) st ts but x y)
@@ -199,38 +199,38 @@
     (setf (gtk:window-default-size window) '(900 800))
 
     (setf (camera-world-rectangle) (make-rectangle :width (* +tiles-count-h+ +tile-side+)
-						   :height (* +tiles-count-v+ +tile-side+)))
+                                                   :height (* +tiles-count-v+ +tile-side+)))
 
     (let ((box (gtk:make-box :orientation gtk:+orientation-horizontal+
                              :spacing 4)))
       (let ((scrolled-window (gtk:make-scrolled-window))
-	    (list-box (gtk:make-list-box)))
-	(load-tiles list-box)
+            (list-box (gtk:make-list-box)))
+        (load-tiles list-box)
         (gtk:connect list-box "row-activated"
                      (lambda (self row)
                        (declare (ignore self))
                        (setf *editor-tile* (gtk:list-box-row-index row))))
-	(setf (gtk:scrolled-window-child scrolled-window) list-box)
+        (setf (gtk:scrolled-window-child scrolled-window) list-box)
 
-	(setf (gtk:widget-hexpand-p scrolled-window) t)
-	(gtk:box-append box scrolled-window))
+        (setf (gtk:widget-hexpand-p scrolled-window) t)
+        (gtk:box-append box scrolled-window))
 
       (let ((right-box (gtk:make-box :orientation gtk:+orientation-vertical+
-				     :spacing 4)))
+                                     :spacing 4)))
 
-	(let* ((sketch-area (make-sketch-area *sketch-name-for-area*))
+        (let* ((sketch-area (make-sketch-area *sketch-name-for-area*))
                (area (gl-area sketch-area)))
           (setf (gtk:widget-size-request area) '(800 800))
           (gtk:box-append right-box area))
 
-	(let ((bottom-right-box (gtk:make-box :orientation gtk:+orientation-horizontal+
-					      :spacing 4))
-	      (exit-btn (gtk:make-button :label "Exit"))
-	      (layer-1-btn (gtk:make-button :label "L1"))
-	      (layer-2-btn (gtk:make-button :label "L2"))
-	      (all-layers-btn (gtk:make-button :label "All"))
-	      (save-btn (gtk:make-button :label "Save"))
-	      (load-btn (gtk:make-button :label "Load")))
+        (let ((bottom-right-box (gtk:make-box :orientation gtk:+orientation-horizontal+
+                                              :spacing 4))
+              (exit-btn (gtk:make-button :label "Exit"))
+              (layer-1-btn (gtk:make-button :label "L1"))
+              (layer-2-btn (gtk:make-button :label "L2"))
+              (all-layers-btn (gtk:make-button :label "All"))
+              (save-btn (gtk:make-button :label "Save"))
+              (load-btn (gtk:make-button :label "Load")))
 
           (gtk:connect exit-btn "clicked" (lambda (button)
                                             (declare (ignore button))
@@ -238,97 +238,97 @@
                                             (when *quit-on-close*
                                               (uiop:quit))))
 
-	  (gtk:connect layer-1-btn "clicked" (lambda (button)
+          (gtk:connect layer-1-btn "clicked" (lambda (button)
                                                (declare (ignore button))
-					       (setf *current-layer* 1)
-					       (setf (gtk:widget-sensitive-p layer-1-btn) nil)
-					       (setf (gtk:widget-sensitive-p layer-2-btn) t)
-					       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
+                                               (setf *current-layer* 1)
+                                               (setf (gtk:widget-sensitive-p layer-1-btn) nil)
+                                               (setf (gtk:widget-sensitive-p layer-2-btn) t)
+                                               (setf (gtk:widget-sensitive-p all-layers-btn) t)))
 
-	  (gtk:connect layer-2-btn "clicked" (lambda (button)
+          (gtk:connect layer-2-btn "clicked" (lambda (button)
                                                (declare (ignore button))
-					       (setf *current-layer* 2)
-					       (setf (gtk:widget-sensitive-p layer-1-btn) t)
-					       (setf (gtk:widget-sensitive-p layer-2-btn) nil)
-					       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
+                                               (setf *current-layer* 2)
+                                               (setf (gtk:widget-sensitive-p layer-1-btn) t)
+                                               (setf (gtk:widget-sensitive-p layer-2-btn) nil)
+                                               (setf (gtk:widget-sensitive-p all-layers-btn) t)))
 
-	  (gtk:connect all-layers-btn "clicked" (lambda (button)
-						  (declare (ignore button))
-						  (setf *current-layer* 0)
-						  (setf (gtk:widget-sensitive-p layer-1-btn) t)
-						  (setf (gtk:widget-sensitive-p layer-2-btn) t)
-						  (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
+          (gtk:connect all-layers-btn "clicked" (lambda (button)
+                                                  (declare (ignore button))
+                                                  (setf *current-layer* 0)
+                                                  (setf (gtk:widget-sensitive-p layer-1-btn) t)
+                                                  (setf (gtk:widget-sensitive-p layer-2-btn) t)
+                                                  (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
 
-	  (gtk:connect save-btn "clicked" (lambda (button)
-					    (declare (ignore button))
-					    (setf *current-layer* 0)
-					    (setf (gtk:widget-sensitive-p layer-1-btn) t)
-					    (setf (gtk:widget-sensitive-p layer-2-btn) t)
-					    (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
+          (gtk:connect save-btn "clicked" (lambda (button)
+                                            (declare (ignore button))
+                                            (setf *current-layer* 0)
+                                            (setf (gtk:widget-sensitive-p layer-1-btn) t)
+                                            (setf (gtk:widget-sensitive-p layer-2-btn) t)
+                                            (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
 
-	  (gtk:connect save-btn "clicked"
-		       (lambda (button)
-			 (declare (ignore button))
-			 (labels ((game-object (tile-id)
-				    (ecase tile-id
-				      (0 'empty)
-				      (1 'box)
-				      (2 'semi-wall)
-				      (3 'hourglass-1)
-				      (4 'ground)
-				      (5 'water)
-				      (6 'wall)
-				      (7 'hourglass-2)))
+          (gtk:connect save-btn "clicked"
+                       (lambda (button)
+                         (declare (ignore button))
+                         (labels ((game-object (tile-id)
+                                    (ecase tile-id
+                                      (0 'empty)
+                                      (1 'box)
+                                      (2 'semi-wall)
+                                      (3 'hourglass-1)
+                                      (4 'ground)
+                                      (5 'water)
+                                      (6 'wall)
+                                      (7 'hourglass-2)))
 
-				  (make-object (tile-id x y layer)
-				    (make-instance (game-object tile-id)
-						   :position (list x y)
-						   :layer layer)))
-			   (let ((world (make-instance 'world)))
-			     (loop for xt from 0 below +tiles-count-h+
-				   do (loop for yt from 0 below +tiles-count-v+
-					    do (add-to-world (make-object (aref *layer-1* xt yt) xt yt 1) world)))
-			     (loop for xt from 0 below +tiles-count-h+
-				   do (loop for yt from 0 below +tiles-count-v+
-					    do (add-to-world (make-object (aref *layer-2* xt yt) xt yt 2) world)))
-			     (save-world world "map")))))
+                                  (make-object (tile-id x y layer)
+                                    (make-instance (game-object tile-id)
+                                                   :position (list x y)
+                                                   :layer layer)))
+                           (let ((world (make-instance 'world)))
+                             (loop for xt from 0 below +tiles-count-h+
+                                   do (loop for yt from 0 below +tiles-count-v+
+                                            do (add-to-world (make-object (aref *layer-1* xt yt) xt yt 1) world)))
+                             (loop for xt from 0 below +tiles-count-h+
+                                   do (loop for yt from 0 below +tiles-count-v+
+                                            do (add-to-world (make-object (aref *layer-2* xt yt) xt yt 2) world)))
+                             (save-world world "map")))))
 
-	  (gtk:connect load-btn "clicked"
-		       (lambda (button)
-			 (declare (ignore button))
-			 (labels ((tile-id (object-class)
-				    (ecase object-class
-				      (:empty 0)
-				      (:box 1)
-				      (:semi-wall 2)
-				      (:hourglass-1 3)
-				      (:ground 4)
-				      (:water 5)
-				      (:wall 6)
-				      (:hourglass-2 7))))
+          (gtk:connect load-btn "clicked"
+                       (lambda (button)
+                         (declare (ignore button))
+                         (labels ((tile-id (object-class)
+                                    (ecase object-class
+                                      (:empty 0)
+                                      (:box 1)
+                                      (:semi-wall 2)
+                                      (:hourglass-1 3)
+                                      (:ground 4)
+                                      (:water 5)
+                                      (:wall 6)
+                                      (:hourglass-2 7))))
 
-			   (let ((world (load-world "map")))
-			     (dolist (object (world-objects world))
-			       (destructuring-bind (object-class &key position layer)
-				   (object->list object)
-				 (ecase layer
-				   (1 (setf (aref *layer-1* (first position) (second position))
-					    (tile-id object-class)))
-				   (2 (setf (aref *layer-2* (first position) (second position))
-					    (tile-id object-class))))))))))
+                           (let ((world (load-world "map")))
+                             (dolist (object (world-objects world))
+                               (destructuring-bind (object-class &key position layer)
+                                   (object->list object)
+                                 (ecase layer
+                                   (1 (setf (aref *layer-1* (first position) (second position))
+                                            (tile-id object-class)))
+                                   (2 (setf (aref *layer-2* (first position) (second position))
+                                            (tile-id object-class))))))))))
 
-	  (setf (gtk:widget-sensitive-p layer-1-btn) nil)
+          (setf (gtk:widget-sensitive-p layer-1-btn) nil)
 
-	  (gtk:box-append bottom-right-box all-layers-btn)
-	  (gtk:box-append bottom-right-box layer-1-btn)
-	  (gtk:box-append bottom-right-box layer-2-btn)
-	  (gtk:box-append bottom-right-box save-btn)
-	  (gtk:box-append bottom-right-box load-btn)
-	  (gtk:box-append bottom-right-box exit-btn)
+          (gtk:box-append bottom-right-box all-layers-btn)
+          (gtk:box-append bottom-right-box layer-1-btn)
+          (gtk:box-append bottom-right-box layer-2-btn)
+          (gtk:box-append bottom-right-box save-btn)
+          (gtk:box-append bottom-right-box load-btn)
+          (gtk:box-append bottom-right-box exit-btn)
 
           (gtk:box-append right-box bottom-right-box))
 
-	(gtk:box-append box right-box))
+        (gtk:box-append box right-box))
 
       (setf (gtk:window-child window) box))
 

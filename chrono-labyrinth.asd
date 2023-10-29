@@ -13,7 +13,7 @@
                "deploy"
                "bordeaux-threads"
                "cl-gtk4"
-	       "cl-gdk4")
+               "cl-gdk4")
 
   :pathname "src"
   :serial T
@@ -22,7 +22,7 @@
                (:file "gtk-sketch-area")
                (:file "utils")
                (:file "caching-methods")
-	       (:file "camera")
+               (:file "camera")
                (:file "gtk")
                (:file "character")
                (:file "music")
