@@ -1,20 +1,20 @@
 (in-package #:chrono-labyrinth)
 
-(defconstant +tile-side+ 48)
-(defconstant +tile-count+ 29)
+(defconstant +tile-side+ 32)
+(defconstant +tile-count+ 8)
 
 (defparameter +tiles-count-v+ 100)
 (defparameter +tiles-count-h+ 100)
-(defparameter +tiles-per-row+ 10)
+(defparameter +tiles-per-row+ 4)
 
-(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 3))
+(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 5))
 (defparameter *editor-tile* 0)
 
 (defun draw-tile (tile-id point &optional color)
   (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
     (s:image (s:colored-image
               (s:load-resource
-               (data-path "textures/tiles.png")
+               (data-path "textures/tiles-min.png")
                :x (* sx +tile-side+)
                :y (* sy +tile-side+)
                :w +tile-side+
@@ -127,7 +127,7 @@
 	 (tile-count 0))
     (dotimes (y (/ height +tile-side+))
       (dotimes (x (/ width +tile-side+))
-	(when (< tile-count 29)
+	(when (< tile-count +tile-count+)
 	  (let ((image (gtk:make-image
 			:pixbuf (gdk-pixbuf2:pixbuf-new-subpixbuf
 				 tiles

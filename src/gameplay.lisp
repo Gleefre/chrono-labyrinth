@@ -1,6 +1,6 @@
 (in-package #:chrono-labyrinth)
 
-(defmethod move ((game-block game-block) action &optional (world *world*))
+(defmethod move :before ((game-block game-block) action &optional (world *world*))
   (when (or (eq (block-on-cancel game-block) :continue)
             (eq (primary-action game-block (world-time-flow world))
                 action))
@@ -33,6 +33,7 @@
       (dolist (object (world-objects world))
         (when (deadp object)
           (remove-object object)))
-      (cleanup-world))))
+      (cleanup-world)))
+  world)
 
 (defun make-game ())
