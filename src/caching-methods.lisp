@@ -1,33 +1,37 @@
 (in-package #:chrono-labyrinth)
 
+;;; FIXME: It would be better to use a gensym here,
+;;; but that seems to break compiled code :/
 (defmacro cache-methods ((with-cache-name &optional clear-cache-name) &body methods)
-  (let ((cachep-var (gensym "%*CACHEP*"))
+  (let ((cachep-var (a:symbolicate '#:%cache%* with-cache-name '#:-cachep*)
+          #+nil (gensym "%*CACHEP*"))
         (key-var (gensym "KEY"))
         (cache-vars ()))
-    `(progn
-       (defvar ,cachep-var)
-       ,@(loop for (name args) in methods
-               for cache-table-var = (gensym (with-standard-io-syntax
-                                               (format nil "%*~A-CACHE*" name)))
-               for key = `(list* ,@(mapcar #'car (mapcar #'a:ensure-list args)))
-               do (push cache-table-var cache-vars)
-               collect `(defvar ,cache-table-var)
-               collect `(defmethod ,name :around ,args
-                          (if ,cachep-var
-                              (let ((,key-var ,key))
-                                (or (gethash ,key-var ,cache-table-var)
-                                    (setf (gethash ,key-var ,cache-table-var)
-                                          (call-next-method))))
-                              (call-next-method))))
-       ,@(when clear-cache-name
-           `((defun ,clear-cache-name ()
-               ,@(loop for var in cache-vars
-                       collect `(clrhash ,var)))))
-       (defmacro ,with-cache-name (&body body)
-         `(let (,@',(loop for var in cache-vars
-                          collect `(,var (make-hash-table :test 'equal)))
-                (,',cachep-var t))
-            ,@body)))))
+    `(serapeum:eval-always
+       (progn
+         (defvar ,cachep-var)
+         ,@(loop for (name args) in methods
+                 for cache-table-var = (a:symbolicate '#:%cache%* name '#:*)
+                 #+nil (gensym (with-standard-io-syntax (format nil "%*~A-CACHE*" name)))
+                 for key = `(list* ,@(mapcar #'car (mapcar #'a:ensure-list args)))
+                 do (push cache-table-var cache-vars)
+                 collect `(defvar ,cache-table-var)
+                 collect `(defmethod ,name :around ,args
+                            (if ,cachep-var
+                                (let ((,key-var ,key))
+                                  (or (gethash ,key-var ,cache-table-var)
+                                      (setf (gethash ,key-var ,cache-table-var)
+                                            (call-next-method))))
+                                (call-next-method))))
+         ,@(when clear-cache-name
+             `((defun ,clear-cache-name ()
+                 ,@(loop for var in cache-vars
+                         collect `(clrhash ,var)))))
+         (defmacro ,with-cache-name (&body body)
+           `(let (,@',(loop for var in cache-vars
+                            collect `(,var (make-hash-table :test 'equal)))
+                  (,',cachep-var t))
+              ,@body))))))
 
 #+nil
 (cache-methods (with-actions-cached clr-actions-cache)
