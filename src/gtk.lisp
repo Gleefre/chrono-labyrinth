@@ -159,13 +159,13 @@
 
 #+darwin
 (defmethod kit.sdl2:mousebutton-event :around ((sketch sketch::sketch) st ts but x y)
-  (let ((m 1))
+  (let ((m 2))
     (call-next-method sketch st ts but (* x m) (* y m)))
   #+()(call-next-method sketch st ts but (/ x 1.5) (/ y 1.5)))
 
 #+darwin
 (defmethod kit.sdl2:mousemotion-event :around ((sketch sketch::sketch) ts bm x y xrel yrel)
-  (let ((m 1))
+  (let ((m 2))
     (call-next-method sketch ts bm (* x m) (* y m) (* xrel m) (* yrel m)))
   #+()(call-next-method sketch ts bm (/ x 1.5) (/ y 1.5) (/ xrel 1.5) (/ yrel 1.5)))
 
