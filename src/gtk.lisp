@@ -47,37 +47,37 @@
 (s:defsketch tile-test ((s:title "tile")
                         (choose-xy nil))
   (s:background s:+black+)
-  (s:with-pen (s:make-pen)
-    (destructuring-bind ((x x+ y y+) (x= y= w= h=))
-        (apply #'choosed-area choose-xy
-               (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
-                             (* +tiles-count-h+ +tile-side+)
-                             (* +tiles-count-v+ +tile-side+)
-                             s:width s:height))
-      (loop for xt from 0 below +tiles-count-h+
-            do (loop for yt from 0 below +tiles-count-v+
-                     do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
-									 :y (* yt +tile-side+)
-									 :width +tile-side+
-									 :height +tile-side+))
-			  (if (and (<= x xt x+)
-                                   (<= y yt y+))
-                              (draw-tile *editor-tile*
-					 (camera-world-to-screen
-					  (make-point :x (* xt +tile-side+)
-						      :y (* yt +tile-side+)))
-					 (s:rgb 1 1 1 0.9))
-                              (draw-tile (aref *tiles* xt yt)
-					 (camera-world-to-screen
-					  (make-point :x (* xt +tile-side+)
-						      :y (* yt +tile-side+))))))))
-      (s+:with-color (s:+red+ :stroke)
-        (s:rect x= y= w= h=)))))
+  (s+:with-fit (800 800 s:width s:height)
+    (s:with-pen (s:make-pen)
+      (destructuring-bind ((x x+ y y+) (x= y= w= h=))
+          (apply #'choosed-area choose-xy
+                 (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
+                               800 800
+                               s:width s:height))
+        (loop for xt from 0 below +tiles-count-h+
+              do (loop for yt from 0 below +tiles-count-v+
+                       do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
+									   :y (* yt +tile-side+)
+									   :width +tile-side+
+									   :height +tile-side+))
+			    (if (and (<= x xt x+)
+                                     (<= y yt y+))
+                                (draw-tile *editor-tile*
+					   (camera-world-to-screen
+					    (make-point :x (* xt +tile-side+)
+						        :y (* yt +tile-side+)))
+					   (s:rgb 1 1 1 0.9))
+                                (draw-tile (aref *tiles* xt yt)
+					   (camera-world-to-screen
+					    (make-point :x (* xt +tile-side+)
+						        :y (* yt +tile-side+))))))))
+        (s+:with-color (s:+red+ :stroke)
+          (s:rect x= y= w= h=))))))
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
   (destructuring-bind (x y) (s+:fit-point x y
-                                          (* +tiles-count-h+ +tile-side+) (* +tiles-count-v+ +tile-side+)
+                                          800 800
                                           (s:sketch-width sketch) (s:sketch-height sketch))
     (when (eq but 1)
       (case st
