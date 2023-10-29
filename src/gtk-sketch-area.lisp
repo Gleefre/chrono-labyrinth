@@ -1,9 +1,22 @@
 (in-package #:chrono-labyrinth)
 
 (defun %%make-scancode (gtk-keycode)
-  (declare (ignore gtk-keycode))
   ;; FIXME
-  (sdl2:scancode-key-to-value :scancode-unknown))
+  (cond
+    ((= gtk-keycode 13)
+     (sdl2:scancode-key-to-value :scancode-w))
+
+    ((= gtk-keycode 0)
+     (sdl2:scancode-key-to-value :scancode-a))
+
+    ((= gtk-keycode 2)
+     (sdl2:scancode-key-to-value :scancode-d))
+
+    ((= gtk-keycode 1)
+     (sdl2:scancode-key-to-value :scancode-s))
+
+    (t
+     (sdl2:scancode-key-to-value :scancode-unknown))))
 
 (defun %%make-value (gtk-keyval)
   (declare (ignore gtk-keyval))
@@ -72,7 +85,7 @@
                    (lambda (controller keyval keycode state)
                      (declare (ignore controller))
                      (setf (gethash keycode pressed) nil)
-                     (kit.sdl2:keyboard-event sketch :keydown nil nil (%%make-keysym keyval keycode state))))
+                     (kit.sdl2:keyboard-event sketch :keyup nil nil (%%make-keysym keyval keycode state))))
       (gtk:widget-add-controller area controller))
     (let ((controller (gtk:make-event-controller-motion)))
       (gtk:connect controller "enter"
@@ -91,6 +104,7 @@
       (gtk:connect controller "pressed"
                    (lambda (controller num x y)
                      (declare (ignore num))
+		     (gtk:widget-grab-focus area)
                      (let ((button (gtk:gesture-single-current-button controller)))
                        (setf (ldb (byte 1 (1- button)) bmask) 1)
                        (kit.sdl2:mousebutton-event sketch :mousebuttondown nil button x y))))

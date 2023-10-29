@@ -3,25 +3,27 @@
 (defconstant +tile-side+ 48)
 (defconstant +tile-count+ 29)
 
-(defparameter +tiles-count-v+ 15)
-(defparameter +tiles-count-h+ 15)
+(defparameter +tiles-count-v+ 100)
+(defparameter +tiles-count-h+ 100)
 (defparameter +tiles-per-row+ 10)
 
 (defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 3))
 (defparameter *editor-tile* 0)
 
-(defun draw-tile (tile-id &optional color)
-  (multiple-value-bind (y x) (floor tile-id +tiles-per-row+)
+(defun draw-tile (tile-id point &optional color)
+  (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
     (s:image (s:colored-image
               (s:load-resource
                (data-path "textures/tiles.png")
-               :x (* x +tile-side+)
-               :y (* y +tile-side+)
+               :x (* sx +tile-side+)
+               :y (* sy +tile-side+)
                :w +tile-side+
                :h +tile-side+)
               color)
-             0
-             0)))
+             (x point)
+             (y point)
+	     +tile-side+
+	     +tile-side+)))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
@@ -45,25 +47,32 @@
 (s:defsketch tile-test ((s:title "tile")
                         (choose-xy nil))
   (s:background s:+black+)
-  (s+:with-fit ((* +tiles-count-h+ +tile-side+)
-                (* +tiles-count-v+ +tile-side+)
-                s:width s:height)
-    (s:with-pen (s:make-pen)
-      (destructuring-bind ((x x+ y y+) (x= y= w= h=))
-          (apply #'choosed-area choose-xy
-                 (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
-                               (* +tiles-count-h+ +tile-side+)
-                               (* +tiles-count-v+ +tile-side+)
-                               s:width s:height))
-        (loop for xt from 0 below +tiles-count-h+
-              do (loop for yt from 0 below +tiles-count-v+
-                       do (s:with-translate ((* xt +tile-side+) (* yt +tile-side+))
-                            (if (and (<= x xt x+)
-                                     (<= y yt y+))
-                                (draw-tile *editor-tile* (s:rgb 1 1 1 0.9))
-                                (draw-tile (aref *tiles* xt yt))))))
-        (s+:with-color (s:+red+ :stroke)
-          (s:rect x= y= w= h=))))))
+  (s:with-pen (s:make-pen)
+    (destructuring-bind ((x x+ y y+) (x= y= w= h=))
+        (apply #'choosed-area choose-xy
+               (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
+                             (* +tiles-count-h+ +tile-side+)
+                             (* +tiles-count-v+ +tile-side+)
+                             s:width s:height))
+      (loop for xt from 0 below +tiles-count-h+
+            do (loop for yt from 0 below +tiles-count-v+
+                     do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
+									 :y (* yt +tile-side+)
+									 :width +tile-side+
+									 :height +tile-side+))
+			  (if (and (<= x xt x+)
+                                   (<= y yt y+))
+                              (draw-tile *editor-tile*
+					 (camera-world-to-screen
+					  (make-point :x (* xt +tile-side+)
+						      :y (* yt +tile-side+)))
+					 (s:rgb 1 1 1 0.9))
+                              (draw-tile (aref *tiles* xt yt)
+					 (camera-world-to-screen
+					  (make-point :x (* xt +tile-side+)
+						      :y (* yt +tile-side+))))))))
+      (s+:with-color (s:+red+ :stroke)
+        (s:rect x= y= w= h=)))))
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
@@ -90,6 +99,21 @@
              (loop for x from x to x*
                    do (loop for y from y to y*
                             do (setf (aref *tiles* x y) *editor-tile*))))))))))
+
+(defmethod kit.sdl2:keyboard-event ((sketch tile-test) st ts repeat-p keysym)
+  (when (eq st :keydown)
+    (cond
+      ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-w)
+       (camera-move (make-point :y -1.0)))
+
+      ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-s)
+       (camera-move (make-point :y 1.0)))
+
+      ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-a)
+       (camera-move (make-point :x -1.0)))
+
+      ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
+       (camera-move (make-point :x 1.0))))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
@@ -128,11 +152,24 @@
 	      (gtk:list-box-insert list-box box tile-count)
 	      (incf tile-count))))))))
 
+#+darwin
+(defmethod kit.sdl2:mousebutton-event :around ((sketch sketch::sketch) st ts but x y)
+  (call-next-method sketch st ts but (/ x 1.5) (/ y 1.5)))
+
+#+darwin
+(defmethod kit.sdl2:mousemotion-event :around ((sketch sketch::sketch) ts bm x y xrel yrel)
+  (call-next-method sketch ts bm (/ x 1.5) (/ y 1.5) (/ xrel 1.5) (/ yrel 1.5)))
+
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
   (gtk:define-main-window (window (gtk:make-application-window :application gtk:*application*))
     (setf (gtk:window-title window) "Chrono Maze")
     (setf (gtk:window-default-size window) '(900 800))
+
+    (setf (camera-view-port-width) 200)
+    (setf (camera-view-port-height) 200)
+    (setf (camera-world-rectangle) (make-rectangle :width (* +tiles-count-h+ +tile-side+)
+						   :height (* +tiles-count-v+ +tile-side+)))
 
     (let ((box (gtk:make-box :orientation gtk:+orientation-horizontal+
                              :spacing 4)))
