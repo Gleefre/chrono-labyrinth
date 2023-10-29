@@ -13,10 +13,6 @@
 
 (defgeneric object->tag (object))  ; defined below
 
-(defmethod object->untagged-list append ((world world))
-  (list :time-flow (world-time-flow world)
-        :objects (mapcar #'object->list (reverse (world-objects world)))))
-
 (defgeneric object->untagged-list (object)
   (:method-combination append))
 
@@ -33,6 +29,10 @@
 
 (defmethod object->untagged-list append ((hourglass hourglass))
   (list :charged (hourglass-charged hourglass)))
+
+(defmethod object->untagged-list append ((world world))
+  (list :time-flow (world-time-flow world)
+        :objects (mapcar #'object->list (reverse (world-objects world)))))
 
 ;;; Converting from list
 
