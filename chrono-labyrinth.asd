@@ -2,7 +2,7 @@
   :description "Chrono Labyrinth"
   :version "0.0.0"
   :author ("Gleefre <varedif.a.s@gmail.com>"
-           "...")
+           "Vyacheslav Mikushev")
   :licence "Apache 2.0"
 
   :depends-on ("uiop" "asdf"
