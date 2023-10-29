@@ -7,23 +7,20 @@
 (defparameter +tiles-count-h+ 100)
 (defparameter +tiles-per-row+ 4)
 
-(defparameter *tiles* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 5))
+(defparameter *layer-1* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 0))
+(defparameter *layer-2* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 0))
 (defparameter *editor-tile* 0)
 
 (defun draw-tile (tile-id point &optional color)
   (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
-    (s:image (s:colored-image
-              (s:load-resource
-               (data-path "textures/tiles-min.png")
-               :x (* sx +tile-side+)
-               :y (* sy +tile-side+)
-               :w +tile-side+
-               :h +tile-side+)
-              color)
-             (x point)
-             (y point)
-	     +tile-side+
-	     +tile-side+)))
+    (s:image (s:crop (s:load-resource
+		      (data-path "textures/tiles-min.png"))
+		     (* sx +tile-side+)
+		     (* sy +tile-side+)
+		     +tile-side+
+		     +tile-side+)
+	     (x point)
+	     (y point))))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
@@ -53,33 +50,56 @@
 	   (y (y world-point)))
       (list x y))))
 
+(defparameter *current-layer* 1)
+
+(defun draw-layer (layer)
+  (loop for xt from 0 below +tiles-count-h+
+        do (loop for yt from 0 below +tiles-count-v+
+                 do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
+								     :y (* yt +tile-side+)
+								     :width +tile-side+
+								     :height +tile-side+))
+		      (draw-tile (aref layer xt yt)
+				 (camera-world-to-screen
+				  (make-point :x (* xt +tile-side+)
+					      :y (* yt +tile-side+))))))))
+
+(defun draw-all-layers ()
+  (draw-layer *layer-1*)
+  (draw-layer *layer-2*))
+
 (s:defsketch tile-test ((s:title "tile")
                         (choose-xy nil))
   (s:background s:+black+)
   (s+:with-fit (800 800 s:width s:height)
     (s:with-pen (s:make-pen)
-      (destructuring-bind ((x x+ y y+) (x= y= w= h=))
-          (apply #'choosed-area choose-xy (screen->world (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
-							 s:width s:height))
-	(loop for xt from 0 below +tiles-count-h+
-              do (loop for yt from 0 below +tiles-count-v+
-                       do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
-									   :y (* yt +tile-side+)
-									   :width +tile-side+
-									   :height +tile-side+))
-			    (if (and (<= x xt x+)
-                                     (<= y yt y+))
-				(draw-tile *editor-tile*
-					   (camera-world-to-screen
-					    (make-point :x (* xt +tile-side+)
-							:y (* yt +tile-side+)))
-					   (s:rgb 1 1 1 0.9))
-				(draw-tile (aref *tiles* xt yt)
-					   (camera-world-to-screen
-					    (make-point :x (* xt +tile-side+)
-							:y (* yt +tile-side+))))))))
-	(s+:with-color (s:+red+ :stroke)
-          (s:rect x= y= w= h=))))))
+      (if (zerop *current-layer*)
+	  (draw-all-layers)
+	  (destructuring-bind ((x x+ y y+) (x= y= w= h=))
+              (apply #'choosed-area choose-xy (screen->world (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
+							     s:width s:height))
+	    (let ((layer (ecase *current-layer*
+			   (1 *layer-1*)
+			   (2 *layer-2*))))
+	      (loop for xt from 0 below +tiles-count-h+
+		    do (loop for yt from 0 below +tiles-count-v+
+			     do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
+										 :y (* yt +tile-side+)
+										 :width +tile-side+
+										 :height +tile-side+))
+				  (if (and (<= x xt x+)
+					   (<= y yt y+))
+				      (draw-tile *editor-tile*
+						 (camera-world-to-screen
+						  (make-point :x (* xt +tile-side+)
+							      :y (* yt +tile-side+)))
+						 (s:rgb 1 1 1 0.9))
+				      (draw-tile (aref layer xt yt)
+						 (camera-world-to-screen
+						  (make-point :x (* xt +tile-side+)
+							      :y (* yt +tile-side+)))))))))
+	    (s+:with-color (s:+red+ :stroke)
+              (s:rect x= y= w= h=)))))))
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
@@ -101,9 +121,12 @@
                    x* (a:clamp x* 0 (1- +tiles-count-h+))
                    y  (a:clamp y  0 (1- +tiles-count-v+))
                    y* (a:clamp y* 0 (1- +tiles-count-v+)))
-             (loop for x from x to x*
-                   do (loop for y from y to y*
-                            do (setf (aref *tiles* x y) *editor-tile*))))))))))
+	     (let ((layer (ecase *current-layer*
+			    (1 *layer-1*)
+			    (2 *layer-2*))))
+               (loop for x from x to x*
+                     do (loop for y from y to y*
+                              do (setf (aref layer x y) *editor-tile*)))))))))))
 
 (defmethod kit.sdl2:keyboard-event ((sketch tile-test) st ts repeat-p keysym)
   (when (eq st :keydown)
@@ -200,13 +223,48 @@
           (setf (gtk:widget-size-request area) '(800 800))
           (gtk:box-append right-box area))
 
-	(let ((button (gtk:make-button :label "Exit")))
-          (gtk:connect button "clicked" (lambda (button)
-                                          (declare (ignore button))
-                                          (gtk:window-destroy window)
-                                          (when *quit-on-close*
-                                            (uiop:quit))))
-          (gtk:box-append right-box button))
+	(let ((bottom-right-box (gtk:make-box :orientation gtk:+orientation-horizontal+
+					      :spacing 4))
+	      (exit-btn (gtk:make-button :label "Exit"))
+	      (layer-1-btn (gtk:make-button :label "L1"))
+	      (layer-2-btn (gtk:make-button :label "L2"))
+	      (all-layers-btn (gtk:make-button :label "All")))
+
+          (gtk:connect exit-btn "clicked" (lambda (button)
+                                            (declare (ignore button))
+                                            (gtk:window-destroy window)
+                                            (when *quit-on-close*
+                                              (uiop:quit))))
+
+	  (gtk:connect layer-1-btn "clicked" (lambda (button)
+                                               (declare (ignore button))
+					       (setf *current-layer* 1)
+					       (setf (gtk:widget-sensitive-p layer-1-btn) nil)
+					       (setf (gtk:widget-sensitive-p layer-2-btn) t)
+					       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
+
+	  (gtk:connect layer-2-btn "clicked" (lambda (button)
+                                               (declare (ignore button))
+					       (setf *current-layer* 2)
+					       (setf (gtk:widget-sensitive-p layer-1-btn) t)
+					       (setf (gtk:widget-sensitive-p layer-2-btn) nil)
+					       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
+
+	  (gtk:connect all-layers-btn "clicked" (lambda (button)
+						  (declare (ignore button))
+						  (setf *current-layer* 0)
+						  (setf (gtk:widget-sensitive-p layer-1-btn) t)
+						  (setf (gtk:widget-sensitive-p layer-2-btn) t)
+						  (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
+
+	  (setf (gtk:widget-sensitive-p layer-1-btn) nil)
+
+	  (gtk:box-append bottom-right-box all-layers-btn)
+	  (gtk:box-append bottom-right-box layer-1-btn)
+	  (gtk:box-append bottom-right-box layer-2-btn)
+	  (gtk:box-append bottom-right-box exit-btn)
+
+          (gtk:box-append right-box bottom-right-box))
 
 	(gtk:box-append box right-box))
 
