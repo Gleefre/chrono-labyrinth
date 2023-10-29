@@ -199,3 +199,27 @@
   (let ((world (make-instance 'world :time-flow time-flow)))
     (dolist (world-object (mapcar #'list->object objects) world)
       (add-to-world world-object world))))
+
+;;; Saving to files
+
+(defun save-world (world filename &key (if-exists :error))
+  (a:with-output-to-file (out filename :if-exists if-exists)
+    (with-standard-io-syntax
+      (let ((*print-case* :downcase)
+            (*print-pretty* t)
+            (*print-readably* t)
+            (*print-right-margin* 50))
+        (print (object->list world) out)))))
+
+(defun load-world (filename)
+  (block nil
+    (a:with-input-from-file (in filename :if-does-not-exist nil)
+      (unless (streamp in)
+        (return nil))
+      (with-standard-io-syntax
+        (let ((*read-eval* nil)) ; but setting this to T would allow to "hack" the game via worlds.
+          (let ((world-list (read in nil nil)))
+            (when (or (null world-list)
+                      (not (eq :world (car world-list))))
+              (return nil))
+            (list->object world-list)))))))
