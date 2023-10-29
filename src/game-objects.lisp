@@ -6,7 +6,7 @@
   ((position :initform nil :accessor object-position :initarg :position)
    (layer :initform 2 :accessor object-layer :initarg :layer)))
 
-(defclass named-object (game-object)
+(defclass named-object ()
   ((name :initform nil :accessor object-name)))
 
 (defclass movable (game-object) ())
