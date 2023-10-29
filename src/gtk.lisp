@@ -44,16 +44,22 @@
       (list (list -1 -1 -1 -1)
             (list -1 -1 -1 -1))))
 
+(defun screen->world (x y width height)
+  (destructuring-bind (x y) (s+:fit-point x y
+                                          (* +tiles-count-h+ +tile-side+) (* +tiles-count-v+ +tile-side+)
+                                          width height)
+    (let* ((world-point (camera-screen-to-world (make-point :x x :y y)))
+	   (x (x world-point))
+	   (y (y world-point)))
+      (list x y))))
+
 (s:defsketch tile-test ((s:title "tile")
                         (choose-xy nil))
   (s:background s:+black+)
   (s:with-pen (s:make-pen)
     (destructuring-bind ((x x+ y y+) (x= y= w= h=))
-        (apply #'choosed-area choose-xy
-               (s+:fit-point (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
-                             (* +tiles-count-h+ +tile-side+)
-                             (* +tiles-count-v+ +tile-side+)
-                             s:width s:height))
+        (apply #'choosed-area choose-xy (screen->world (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
+						       s:width s:height))
       (loop for xt from 0 below +tiles-count-h+
             do (loop for yt from 0 below +tiles-count-v+
                      do (when (camera-object-is-visible? (make-rectangle :x (* xt +tile-side+)
@@ -62,12 +68,12 @@
 									 :height +tile-side+))
 			  (if (and (<= x xt x+)
                                    (<= y yt y+))
-                              (draw-tile *editor-tile*
+			      (draw-tile *editor-tile*
 					 (camera-world-to-screen
 					  (make-point :x (* xt +tile-side+)
 						      :y (* yt +tile-side+)))
 					 (s:rgb 1 1 1 0.9))
-                              (draw-tile (aref *tiles* xt yt)
+			      (draw-tile (aref *tiles* xt yt)
 					 (camera-world-to-screen
 					  (make-point :x (* xt +tile-side+)
 						      :y (* yt +tile-side+))))))))
@@ -76,9 +82,7 @@
 
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
-  (destructuring-bind (x y) (s+:fit-point x y
-                                          (* +tiles-count-h+ +tile-side+) (* +tiles-count-v+ +tile-side+)
-                                          (s:sketch-width sketch) (s:sketch-height sketch))
+  (destructuring-bind (x y) (screen->world x y (s:sketch-width sketch) (s:sketch-height sketch))
     (when (eq but 1)
       (case st
         (:mousebuttondown
@@ -104,16 +108,16 @@
   (when (eq st :keydown)
     (cond
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-w)
-       (camera-move (make-point :y -1.0)))
+       (camera-move (make-point :y -8.0)))
 
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-s)
-       (camera-move (make-point :y 1.0)))
+       (camera-move (make-point :y 8.0)))
 
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-a)
-       (camera-move (make-point :x -1.0)))
+       (camera-move (make-point :x -8.0)))
 
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
-       (camera-move (make-point :x 1.0))))))
+       (camera-move (make-point :x 8.0))))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* t)
@@ -121,7 +125,7 @@
 ;; TODO: rename to editor/load-tiles.
 (defun load-tiles (list-box)
   (let* ((tiles (gdk-pixbuf2:make-pixbuf
-		 :filename (data-path "textures/tiles.png")))
+		 :filename (data-path "textures/tiles-min.png")))
 	 (width (gdk-pixbuf2:pixbuf-width tiles))
 	 (height (gdk-pixbuf2:pixbuf-height tiles))
 	 (tile-count 0))
@@ -154,11 +158,15 @@
 
 #+darwin
 (defmethod kit.sdl2:mousebutton-event :around ((sketch sketch::sketch) st ts but x y)
-  (call-next-method sketch st ts but (/ x 1.5) (/ y 1.5)))
+  (let ((m 1))
+    (call-next-method sketch st ts but (* x m) (* y m)))
+  #+()(call-next-method sketch st ts but (/ x 1.5) (/ y 1.5)))
 
 #+darwin
 (defmethod kit.sdl2:mousemotion-event :around ((sketch sketch::sketch) ts bm x y xrel yrel)
-  (call-next-method sketch ts bm (/ x 1.5) (/ y 1.5) (/ xrel 1.5) (/ yrel 1.5)))
+  (let ((m 1))
+    (call-next-method sketch ts bm (* x m) (* y m) (* xrel m) (* yrel m)))
+  #+()(call-next-method sketch ts bm (/ x 1.5) (/ y 1.5) (/ xrel 1.5) (/ yrel 1.5)))
 
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
@@ -166,8 +174,6 @@
     (setf (gtk:window-title window) "Chrono Maze")
     (setf (gtk:window-default-size window) '(900 800))
 
-    (setf (camera-view-port-width) 200)
-    (setf (camera-view-port-height) 200)
     (setf (camera-world-rectangle) (make-rectangle :width (* +tiles-count-h+ +tile-side+)
 						   :height (* +tiles-count-v+ +tile-side+)))
 
