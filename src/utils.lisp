@@ -36,3 +36,29 @@
        frequency)))
 
 (defun make-keyword (name) (values (intern (string-upcase name) "KEYWORD")))
+
+;;; Directions and positions
+
+(defun inverse-direction (direction)
+  (ecase direction
+    (:stay  :stay)
+    (:up    :down)
+    (:down  :up)
+    (:right :left)
+    (:left  :right)))
+
+(defun timed-direction (direction time-flow)
+  (ecase time-flow
+    (:forwards direction)
+    (:backwards (inverse-direction direction))))
+
+(defun in-direction (position direction)
+  (when position
+    (destructuring-bind (x y) position
+      (ecase direction
+        (:stay)
+        (:up    (incf y))
+        (:down  (decf y))
+        (:right (incf x))
+        (:left  (decf x)))
+      (list x y))))
