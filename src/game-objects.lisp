@@ -103,11 +103,15 @@
         (push object (gethash next-position (world-map world)))
         (setf position next-position)))))
 
-(defmethod remove-object ((object game-object) &optional (world *world*))
+(defgeneric remove-object (object &optional world)
+  (:documentation "Removes object from this world. Doesn't remove from world-objects list, see CLEANUP-WORLD.")
+  (:method-combination progn))
+
+(defmethod remove-object progn ((object game-object) &optional (world *world*))
   (a:when-let ((pos (object-position object)))
     (a:removef (gethash pos (world-map world)) object)))
 
-(defmethod remove-object ((object named-object) &optional (world *world*))
+(defmethod remove-object progn ((object named-object) &optional (world *world*))
   (remhash (object-name object) (world-table world)))
 
 (defun cleanup-world (&optional (world *world*))
