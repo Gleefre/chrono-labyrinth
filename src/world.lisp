@@ -1,5 +1,11 @@
 (in-package #:chrono-labyrinth)
 
+;;; :objects initarg for the world
+
+(defmethod initialize-instance :after ((world world) &key objects)
+  (dolist (new-object objects)
+    (add-to-world new-object world)))
+
 ;;; Interacting with world
 
 (defun object-by-name (name &optional (world *world*))

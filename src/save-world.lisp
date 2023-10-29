@@ -54,6 +54,9 @@
 (defmethod field->initarg ((name (eql :program)) program)
   (coerce program 'vector))
 
+(defmethod field->initarg ((name (eql :objects)) objects)
+  (mapcar #'list->object objects))
+
 ;;; Trivial methods for tag->class and object->tag
 
 (macrolet ((defmethods (&rest classes)
@@ -72,12 +75,6 @@
     hourglass
     level-exit
     world))
-
-;; world
-(defmethod tag-list->object ((tag (eql :world)) &key objects time-flow)
-  (let ((world (make-instance 'world :time-flow time-flow)))
-    (dolist (world-object (mapcar #'list->object objects) world)
-      (add-to-world world-object world))))
 
 ;;; Saving to files
 
