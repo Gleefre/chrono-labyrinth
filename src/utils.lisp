@@ -34,3 +34,5 @@
   (defun sdl-performance-counter ()
     (/ (sdl2:get-performance-counter)
        frequency)))
+
+(defun make-keyword (name) (values (intern (string-upcase name) "KEYWORD")))

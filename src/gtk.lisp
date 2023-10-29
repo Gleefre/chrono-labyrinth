@@ -228,7 +228,9 @@
 	      (exit-btn (gtk:make-button :label "Exit"))
 	      (layer-1-btn (gtk:make-button :label "L1"))
 	      (layer-2-btn (gtk:make-button :label "L2"))
-	      (all-layers-btn (gtk:make-button :label "All")))
+	      (all-layers-btn (gtk:make-button :label "All"))
+	      (save-btn (gtk:make-button :label "Save"))
+	      (load-btn (gtk:make-button :label "Load")))
 
           (gtk:connect exit-btn "clicked" (lambda (button)
                                             (declare (ignore button))
@@ -257,11 +259,71 @@
 						  (setf (gtk:widget-sensitive-p layer-2-btn) t)
 						  (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
 
+	  (gtk:connect save-btn "clicked" (lambda (button)
+					    (declare (ignore button))
+					    (setf *current-layer* 0)
+					    (setf (gtk:widget-sensitive-p layer-1-btn) t)
+					    (setf (gtk:widget-sensitive-p layer-2-btn) t)
+					    (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
+
+	  (gtk:connect save-btn "clicked"
+		       (lambda (button)
+			 (declare (ignore button))
+			 (labels ((game-object (tile-id)
+				    (ecase tile-id
+				      (0 'empty)
+				      (1 'box)
+				      (2 'semi-wall)
+				      (3 'hourglass-1)
+				      (4 'ground)
+				      (5 'water)
+				      (6 'wall)
+				      (7 'hourglass-2)))
+
+				  (make-object (tile-id x y layer)
+				    (make-instance (game-object tile-id)
+						   :position (list x y)
+						   :layer layer)))
+			   (let ((world (make-instance 'world)))
+			     (loop for xt from 0 below +tiles-count-h+
+				   do (loop for yt from 0 below +tiles-count-v+
+					    do (add-to-world (make-object (aref *layer-1* xt yt) xt yt 1) world)))
+			     (loop for xt from 0 below +tiles-count-h+
+				   do (loop for yt from 0 below +tiles-count-v+
+					    do (add-to-world (make-object (aref *layer-2* xt yt) xt yt 2) world)))
+			     (save-world world "map")))))
+
+	  (gtk:connect load-btn "clicked"
+		       (lambda (button)
+			 (declare (ignore button))
+			 (labels ((tile-id (object-class)
+				    (ecase object-class
+				      (:empty 0)
+				      (:box 1)
+				      (:semi-wall 2)
+				      (:hourglass-1 3)
+				      (:ground 4)
+				      (:water 5)
+				      (:wall 6)
+				      (:hourglass-2 7))))
+
+			   (let ((world (load-world "map")))
+			     (dolist (object (world-objects world))
+			       (destructuring-bind (object-class &key position layer)
+				   (object->list object)
+				 (ecase layer
+				   (1 (setf (aref *layer-1* (first position) (second position))
+					    (tile-id object-class)))
+				   (2 (setf (aref *layer-2* (first position) (second position))
+					    (tile-id object-class))))))))))
+
 	  (setf (gtk:widget-sensitive-p layer-1-btn) nil)
 
 	  (gtk:box-append bottom-right-box all-layers-btn)
 	  (gtk:box-append bottom-right-box layer-1-btn)
 	  (gtk:box-append bottom-right-box layer-2-btn)
+	  (gtk:box-append bottom-right-box save-btn)
+	  (gtk:box-append bottom-right-box load-btn)
 	  (gtk:box-append bottom-right-box exit-btn)
 
           (gtk:box-append right-box bottom-right-box))
