@@ -91,7 +91,8 @@
     (when (and position (not (eq :stay direction)))
       (let ((next-position (in-direction position direction)))
         (a:removef (gethash position (world-map world)) object)
-        (push object (gethash next-position (world-map world)))))))
+        (push object (gethash next-position (world-map world)))
+        (setf position next-position)))))
 
 (defmethod remove-object ((object game-object) &optional (world *world*))
   (a:when-let ((pos (object-position object)))
