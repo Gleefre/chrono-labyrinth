@@ -13,18 +13,14 @@
 
 (defun draw-tile (tile-id point &optional color)
   (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
-    (s:image (s:colored-image
-              (s:load-resource
-               (data-path "textures/tiles-min.png")
-               :x (* sx +tile-side+)
-               :y (* sy +tile-side+)
-               :w +tile-side+
-               :h +tile-side+)
-              color)
-             (x point)
-             (y point)
-	     +tile-side+
-	     +tile-side+)))
+    (s:image (s:crop (s:load-resource
+		      (data-path "textures/tiles-min.png"))
+		     (* sx +tile-side+)
+		     (* sy +tile-side+)
+		     +tile-side+
+		     +tile-side+)
+	     (x point)
+	     (y point))))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
