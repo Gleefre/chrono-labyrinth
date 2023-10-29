@@ -121,7 +121,7 @@
 ;; TODO: rename to editor/load-tiles.
 (defun load-tiles (list-box)
   (let* ((tiles (gdk-pixbuf2:make-pixbuf
-		 :filename (data-path "textures/tiles.png")))
+		 :filename (data-path "textures/tiles-min.png")))
 	 (width (gdk-pixbuf2:pixbuf-width tiles))
 	 (height (gdk-pixbuf2:pixbuf-height tiles))
 	 (tile-count 0))
