@@ -3,8 +3,7 @@
 ;;; Objects
 
 (defclass game-object ()
-  ((position :initform nil :accessor object-position :initarg :position)
-   (layer :initform 2 :accessor object-layer :initarg :layer)))
+  ((position :initform nil :accessor object-position :initarg :position)))
 
 (defclass named-object ()
   ((name :initform nil :accessor object-name)))
@@ -24,19 +23,17 @@
 
 (defclass box (movable) ())
 
+(defclass ground (static) ())
+
 (defclass wall (static) ())
 
 (defclass semi-wall (static) ())
 
-(defclass hourglass-1 (static) ())
+(defclass hourglass (static)
+  ((charged :initform t :accessor hourglass-charged :initarg :charged)))
 
-(defclass hourglass-2 (static) ())
-
-(defclass ground (static) ())
-
-(defclass water (static) ())
-
-(defclass empty (static) ())
+(defclass level-exit (static named-object)
+  ((name :initform :exit)))
 
 (defclass world ()
   ((map       :initform (make-hash-table :test 'equal) :accessor world-map)
@@ -66,6 +63,8 @@
   (push object (world-objects world)))
 
 (defmethod add-to-world :after ((object named-object) &optional (world *world*))
+  (a:when-let ((previous-object (gethash (object-name object) (world-table world))))
+    (remove-object previous-object))
   (setf (gethash (object-name object) (world-table world))
         object))
 
