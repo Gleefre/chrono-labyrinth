@@ -3,7 +3,8 @@
 ;;; Objects
 
 (defclass game-object ()
-  ((position :initform nil :accessor object-position :initarg :position)))
+  ((position :initform nil :accessor object-position :initarg :position)
+   (layer :initform 2 :accessor object-layer :initarg :layer)))
 
 (defclass named-object (game-object)
   ((name :initform nil :accessor object-name)))
@@ -17,17 +18,25 @@
    (offset    :initform 0              :accessor block-offset    :initarg :offset)
    (on-cancel :initform :repeat        :accessor block-on-cancel :initarg :on-cancel)))
 
-(defclass box (movable) ())
-
 (defclass player (movable named-object)
   ((action :initform :stay :accessor player-action)
    (name   :initform :player)))
+
+(defclass box (movable) ())
 
 (defclass wall (static) ())
 
 (defclass semi-wall (static) ())
 
-(defclass fire (static) ())
+(defclass hourglass-1 (static) ())
+
+(defclass hourglass-2 (static) ())
+
+(defclass ground (static) ())
+
+(defclass water (static) ())
+
+(defclass empty (static) ())
 
 (defclass world ()
   ((map       :initform (make-hash-table :test 'equal) :accessor world-map)
@@ -113,6 +122,33 @@
 (defun list->object (list)
   (apply #'tag-list->object list))
 
+;; TODO: A limited version for the wall, ground, etc
+(defmacro gen-base-functions (object-class)
+  `(progn
+     (defmethod copy-game-object ((object ,object-class))
+       (make-instance ',object-class
+                      :position (copy-list (object-position object))
+		      :layer (object-layer object)))
+
+     (defmethod object->list ((object ,object-class))
+       (list ,(make-keyword object-class)
+	     :position (copy-list (object-position object))
+	     :layer (object-layer object)))
+
+     (defmethod tag-list->object ((tag (eql ,(make-keyword object-class))) &key position layer)
+       (make-instance ',object-class
+		      :position (copy-list position)
+		      :layer layer))))
+
+(gen-base-functions box)
+(gen-base-functions wall)
+(gen-base-functions semi-wall)
+(gen-base-functions hourglass-1)
+(gen-base-functions hourglass-2)
+(gen-base-functions ground)
+(gen-base-functions water)
+(gen-base-functions empty)
+
 ;; game-block
 (defmethod copy-game-object ((object game-block))
   (make-instance 'game-block
@@ -135,17 +171,6 @@
                  :on-cancel on-cancel
                  :program (coerce program 'vector)))
 
-;; box
-(defmethod copy-game-object ((object box))
-  (make-instance 'box :position (copy-list (object-position object))))
-
-(defmethod object->list ((object box))
-  (list :box
-        :position (copy-list (object-position object))))
-
-(defmethod tag-list->object ((tag (eql :box)) &key position)
-  (make-instance 'box :position (copy-list position)))
-
 ;; player
 (defmethod copy-game-object ((object player))
   (make-instance 'player
@@ -161,28 +186,6 @@
   (make-instance 'player
                  :position (copy-list position)
                  :action action))
-
-;; wall
-(defmethod copy-game-object ((object wall))
-  (make-instance 'wall :position (copy-list (object-position object))))
-
-(defmethod object->list ((object wall))
-  (list :wall
-        :position (copy-list (object-position object))))
-
-(defmethod tag-list->object ((tag (eql :wall)) &key position)
-  (make-instance 'wall :position (copy-list position)))
-
-;; semi-wall
-(defmethod copy-game-object ((object semi-wall))
-  (make-instance 'semi-wall :position (copy-list (object-position object))))
-
-(defmethod object->list ((object semi-wall))
-  (list :semi-wall
-        :position (copy-list (object-position object))))
-
-(defmethod tag-list->object ((tag (eql :semi-wall)) &key position)
-  (make-instance 'semi-wall :position (copy-list position)))
 
 ;; world
 (defmethod copy-game-object ((object world))
