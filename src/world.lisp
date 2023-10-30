@@ -47,7 +47,8 @@
 
 (defmethod remove-object progn ((object game-object) &optional (world *world*))
   (a:when-let ((pos (object-position object)))
-    (a:removef (gethash pos (world-map world)) object)))
+    (a:removef (gethash pos (world-map world)) object)
+    (setf (object-position object) nil)))
 
 (defmethod remove-object progn ((object named-object) &optional (world *world*))
   (remhash (object-name object) (world-table world)))
