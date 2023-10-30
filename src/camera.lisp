@@ -138,3 +138,8 @@
 		  :y (+ (rectangle/top screen-rectangle) (y *camera-position*))
 		  :width (width screen-rectangle)
 		  :height (height screen-rectangle)))
+
+(defmacro with-camera-view (&body body)
+  `(s:with-translate ((x *camera-position*)
+                      (y *camera-position*))
+     ,@body))

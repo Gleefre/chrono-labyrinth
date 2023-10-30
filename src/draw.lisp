@@ -45,13 +45,17 @@
   (with-slots (position) object
     (when position
       (destructuring-bind (x y) position
-        (s:with-translate ((* (tileset-tile-side +world-tileset+) x)
-                           (* (tileset-tile-side +world-tileset+) y))
-          (call-next-method))))))
+        (let* ((side (tileset-tile-side +world-tileset+))
+               (rx (* side x))
+               (ry (* side y)))
+          (when (camera-object-is-visible? (make-rectangle :x rx :y ry :width side :height side))
+            (s:with-translate (rx ry)
+              (call-next-method))))))))
 
-(defun draw-world (width height camera &optional (world *world*))
-  (declare (ignorable width height camera))
-  (map nil #'draw-object (layered (world-objects world))))
+(defun draw-world (width height &optional (world *world*))
+  (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
+    (with-camera-view ()
+      (map nil #'draw-object (layered (world-objects world))))))
 
 ;; TODO figure out sketch figures?
 (defun draw-clock (clock w h &aux (time (sc:time clock)))
