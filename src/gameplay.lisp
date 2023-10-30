@@ -18,10 +18,8 @@
   (some (a:rcurry #'typep '(or fire game-block))
         (objects-at (object-position player))))
 
-(defun update-world (world &optional (time-flow (world-time-flow world) time-flow-p))
+(defun update-world (world &aux (time-flow (world-time-flow world)))
   (let ((*world* world))
-    (when time-flow-p
-      (setf (world-time-flow world) time-flow))
     (with-actions-cached ()
       (dolist (object (world-objects world))
         ;; Calculating actions so that they are cached.
@@ -33,7 +31,32 @@
       (dolist (object (world-objects world))
         (when (deadp object)
           (remove-object object)))
-      (cleanup-world)))
+      (cleanup-world)
+      (when (eq :backwards (world-time-flow world))
+        (decf (world-time-flow world)))
+      (a:when-let* ((player (object-by-name :player))
+                    (player-position (object-position player)))
+        (loop for h? in (statics-at player-position)
+              when (and (typep h? 'hourglass)
+                        (hourglass-charged h?))
+                do (setf (world-time-flow world) :backwards
+                         (world-backwards-charges world) 5
+                         (hourglass-charged h?) nil)))
+      (unless (plusp (world-backwards-charges world))
+        (setf (world-time-flow world) :forwards))))
   world)
+
+(defun next-world (world)
+  (update-world (copy-game-object world)))
+
+(defun lose? (world)
+  (not (object-by-name :player world)))
+
+(defun win? (world)
+  (a::when-let* ((player (object-by-name :player world))
+                 (exit (object-by-name :exit world))
+                 (player-pos (object-position player))
+                 (exit-pos (object-position exit)))
+    (equal player-pos exit-pos)))
 
 (defun make-game ())

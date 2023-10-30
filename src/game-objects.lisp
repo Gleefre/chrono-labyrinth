@@ -38,5 +38,6 @@
 (defclass world ()
   ((map       :initform (make-hash-table :test 'equal) :accessor world-map)
    (time-flow :initform :forwards                      :accessor world-time-flow :initarg :time-flow)
+   (charges   :initform 0                              :accessor world-backwards-charges :initarg :charges)
    (objects   :initform (list)                         :accessor world-objects)
    (table     :initform (make-hash-table :test 'eq)    :accessor world-table)))

@@ -32,6 +32,7 @@
 
 (defmethod object->untagged-list append ((world world))
   (list :time-flow (world-time-flow world)
+        :charges (world-backwards-charges world)
         :objects (mapcar #'object->list
                          (reverse
                           (remove-if-not #'object-position
