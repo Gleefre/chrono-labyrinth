@@ -5,3 +5,5 @@
 (defvar *game-window*)
 
 (defvar *world*)
+
+(defvar *tileset*)
