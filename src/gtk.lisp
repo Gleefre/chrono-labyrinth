@@ -1,28 +1,29 @@
 (in-package #:chrono-labyrinth)
 
-(defconstant +tile-side+ 32)
-(defconstant +tile-count+ 8)
+(defparameter +tileset-min+
+  (make-instance 'tileset
+                 :filename "textures/tiles-min.png"
+                 :tile-side 32
+                 :columns 4
+                 :count 8))
+
+;(defconstant +tile-side+ 32)
+;(defconstant +tile-count+ 8)
 
 (defparameter +tiles-count-v+ 100)
 (defparameter +tiles-count-h+ 100)
-(defparameter +tiles-per-row+ 4)
+;(defparameter +tiles-per-row+ 4)
 
 (defparameter *layer-1* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 0))
 (defparameter *layer-2* (make-array (list +tiles-count-v+ +tiles-count-h+) :initial-element 0))
 (defparameter *editor-tile* 0)
 
 (defun draw-tile (tile-id point &optional color)
-  (multiple-value-bind (sy sx) (floor tile-id +tiles-per-row+)
-    (s:image (s::colored-image
-              (s:load-resource
-               (data-path "textures/tiles-min.png")
-               :x (* sx +tile-side+)
-               :y (* sy +tile-side+)
-               :w +tile-side+
-               :h +tile-side+)
-              color)
-             (x point)
-             (y point))))
+  (tile tile-id
+        :x (x point)
+        :y (y point)
+        :tileset +tileset-min+
+        :color color))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
