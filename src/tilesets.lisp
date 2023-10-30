@@ -60,4 +60,4 @@
                  :filename "textures/tiles-min.png"
                  :tile-side 32
                  :columns 4
-                 :count 8))
+                 :count 9))
