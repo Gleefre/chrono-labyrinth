@@ -47,7 +47,7 @@
       (list (x world-point)
             (y world-point)))))
 
-(s:defsketch tile-test ((s:title "tile")
+(s:defsketch world-viewer ((s:title "tile")
                         (choose-xy nil)
                         (world (make-instance 'world)))
   (s:background s:+black+)
@@ -79,17 +79,17 @@
       (mapcar #'remove-object (remove-if-not (a:rcurry #'typep type) (objects-at position)))
       (add-to-world (apply #'make-instance type :position position initargs))))
 
-(defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
+(defmethod kit.sdl2:mousebutton-event ((sketch world-viewer) st ts but x y)
   (declare (ignore ts))
-  (let ((*world* (tile-test-world sketch)))
+  (let ((*world* (world-viewer-world sketch)))
     (destructuring-bind (x y) (screen->world x y (s:sketch-width sketch) (s:sketch-height sketch))
       (when (eq but 1)
         (case st
           (:mousebuttondown
-           (setf (tile-test-choose-xy sketch) (list x y)))
+           (setf (world-viewer-choose-xy sketch) (list x y)))
           (:mousebuttonup
-           (destructuring-bind (x* y*) (tile-test-choose-xy sketch)
-             (setf (tile-test-choose-xy sketch) nil)
+           (destructuring-bind (x* y*) (world-viewer-choose-xy sketch)
+             (setf (world-viewer-choose-xy sketch) nil)
              (when (> x x*) (rotatef x x*))
              (when (> y y*) (rotatef y y*))
              (let ((x  (floor x  *side*))
@@ -109,7 +109,7 @@
                                    (7 (toggle (list x y) 'level-exit))
                                    (8 (toggle (list x y) 'player)))))))))))))
 
-(defmethod kit.sdl2:keyboard-event ((sketch tile-test) st ts repeat-p keysym)
+(defmethod kit.sdl2:keyboard-event ((sketch world-viewer) st ts repeat-p keysym)
   (when (eq st :keydown)
     (cond
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-w)
@@ -124,11 +124,11 @@
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
        (camera-move (make-point :x 32.0))))))
 
-(defmethod kit.sdl2:window-event :after ((sketch tile-test) (type (eql :size-changed)) ts w h)
+(defmethod kit.sdl2:window-event :after ((sketch world-viewer) (type (eql :size-changed)) ts w h)
   (setf (camera-view-port-width) w)
   (setf (camera-view-port-height) h))
 
-(defparameter *sketch-name-for-area* 'tile-test)
+(defparameter *sketch-name-for-area* 'world-viewer)
 (defparameter *quit-on-close* nil)
 
 (defun load-modes (list-box &aux (tile-count -1))
@@ -161,16 +161,16 @@
     (mode "Player" +character-tileset+ 0)))
 
 #+darwin
-(defmethod kit.sdl2:mousebutton-event :around ((sketch tile-test) st ts but x y)
+(defmethod kit.sdl2:mousebutton-event :around ((sketch world-viewer) st ts but x y)
   (let ((m 2))
     (call-next-method sketch st ts but (* x m) (* y m))))
 
 #+darwin
-(defmethod kit.sdl2:mousemotion-event :around ((sketch tile-test) ts bm x y xrel yrel)
+(defmethod kit.sdl2:mousemotion-event :around ((sketch world-viewer) ts bm x y xrel yrel)
   (let ((m 2))
     (call-next-method sketch ts bm (* x m) (* y m) (* xrel m) (* yrel m))))
 
-(gtk:define-application (:name simple-counter
+(gtk:define-application (:name editor
                          :id "chrono.maze")
   (gtk:define-main-window (window (gtk:make-application-window :application gtk:*application*))
     (setf (gtk:window-title window) "Chrono Maze")
@@ -215,12 +215,12 @@
             (gtk:connect save-btn "clicked"
                          (lambda (button)
                            (declare (ignore button))
-                           (save-world (tile-test-world (sketch sketch-area)) "map")))
+                           (save-world (world-viewer-world (sketch sketch-area)) "map")))
 
             (gtk:connect load-btn "clicked"
                          (lambda (button)
                            (declare (ignore button))
-                           (setf (tile-test-world (sketch sketch-area)) (load-world "map"))))
+                           (setf (world-viewer-world (sketch sketch-area)) (load-world "map"))))
 
             (gtk:box-append bottom-right-box save-btn)
             (gtk:box-append bottom-right-box load-btn)
