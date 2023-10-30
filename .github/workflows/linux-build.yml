@@ -21,7 +21,7 @@ jobs:
     - name: install sketch & sketch-fit from source
       run: |
         cd $HOME/quicklisp/local-projects/
-        git clone https://github.com/Gleefre/sketch -b gleefre/dump-for-gamejam
+        git clone https://github.com/Gleefre/sketch -b gleefre/dump-fot-gamejam-without-gtk
         git clone https://github.com/Gleefre/sketch-utils
         git clone https://github.com/Shinmera/file-select
     - name: build

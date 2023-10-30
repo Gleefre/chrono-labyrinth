@@ -24,7 +24,7 @@ jobs:
     - name: install sketch & sketch-utils from source
       run: |
         cd D:/a/_temp/msys64/home/runneradmin/quicklisp/local-projects/ # FIXME
-        git clone https://github.com/Gleefre/sketch -b gleefre/dump-for-gamejam
+        git clone https://github.com/Gleefre/sketch -b gleefre/dump-fot-gamejam-without-gtk
         git clone https://github.com/Gleefre/sketch-utils
         git clone https://github.com/Shinmera/file-select
       shell: bash
