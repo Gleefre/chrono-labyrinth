@@ -113,41 +113,6 @@
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* nil)
 
-;; TODO: rename to editor/load-tiles.
-#+nil
-(defun load-tiles (list-box)
-  (let* ((tiles (gdk-pixbuf2:make-pixbuf
-                 :filename (data-path "textures/tiles-min.png")))
-         (width (gdk-pixbuf2:pixbuf-width tiles))
-         (height (gdk-pixbuf2:pixbuf-height tiles))
-         (tile-count 0)
-         (side (tileset-tile-side +world-tileset+)))
-    (dotimes (y (/ height side))
-      (dotimes (x (/ width side))
-        (when (< tile-count (tileset-count +world-tileset+))
-          (let ((image (gtk:make-image
-                        :pixbuf (gdk-pixbuf2:pixbuf-new-subpixbuf
-                                 tiles
-                                 (* x side)
-                                 (* y side)
-                                 side
-                                 side))))
-            (let ((box (gtk:make-box :orientation gtk:+orientation-vertical+
-                                     :spacing 5))
-                  (label (gtk:make-label :str (case tile-count
-                                                (0 "Empty : 0")
-                                                (t (format nil "~a" tile-count))))))
-              (gtk:box-append box image)
-              (gtk:box-append box label)
-
-              (setf (gtk:widget-margin-start box) 5)
-              (setf (gtk:widget-margin-top box) 5)
-              (setf (gtk:widget-margin-end box) 5)
-              (setf (gtk:widget-margin-bottom box) 5)
-
-              (gtk:list-box-insert list-box box tile-count)
-              (incf tile-count))))))))
-
 (defun load-modes (list-box &aux (tile-count -1))
   (labels ((tile-pixbuf (tileset id &aux (side (tileset-tile-side tileset)))
              (multiple-value-bind (y x) (floor id (tileset-columns tileset))
