@@ -68,13 +68,21 @@
             (setf (redo-history *game*) nil)))))
       (:death
        (case (sdl2:scancode keysym)
-         ))
+         ((:scancode-space)
+          (reset-level *game*))))
       (:win
        (case (sdl2:scancode keysym)
-         ))))
+         ((:scancode-space)
+          (next-level *game*))))
+      (:menu
+       (case (sdl2:scancode keysym)
+         ((:scancode-space)
+          (load-level 0 *game*))))))
 
   (setf (state *game*)
-        (cond ((lose? (car (history *game*)))
+        (cond ((null (history *game*))
+               :menu)
+              ((lose? (car (history *game*)))
                :death)
               ((win? (car (history *game*)))
                :win)

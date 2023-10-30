@@ -92,14 +92,15 @@
         (print (object->list world) out)))))
 
 (defun load-world (filename)
-  (block nil
-    (a:with-input-from-file (in filename :if-does-not-exist nil)
-      (unless (streamp in)
-        (return nil))
-      (with-standard-io-syntax
-        (let ((*read-eval* nil)) ; but setting this to T would allow to "hack" the game via worlds.
-          (let ((world-list (read in nil nil)))
-            (when (or (null world-list)
-                      (not (eq :world (car world-list))))
-              (return nil))
-            (list->object world-list)))))))
+  (when filename
+    (block nil
+      (with-open-file (in filename :if-does-not-exist nil :direction :input)
+        (unless (streamp in)
+          (return nil))
+        (with-standard-io-syntax
+          (let ((*read-eval* nil)) ; but setting this to T would allow to "hack" the game via worlds.
+            (let ((world-list (read in nil nil)))
+              (when (or (null world-list)
+                        (not (eq :world (car world-list))))
+                (return nil))
+              (list->object world-list))))))))

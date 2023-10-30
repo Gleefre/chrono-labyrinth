@@ -11,11 +11,11 @@
 (defmethod deadp ((game-object game-object)) nil)
 
 (defmethod deadp ((box box))
-  (some (a:rcurry #'typep '(or game-block box player))
+  (some (a:rcurry #'typep '(or game-block player wall))
         (objects-at (object-position box))))
 
 (defmethod deadp ((player player))
-  (some (a:rcurry #'typep '(or game-block))
+  (some (a:rcurry #'typep '(or game-block wall))
         (objects-at (object-position player))))
 
 (defun update-world (world &aux (time-flow (world-time-flow world)))
@@ -62,7 +62,45 @@
 (defclass game ()
   ((history :initform () :initarg :history :accessor history)
    (redo-history :initform () :accessor redo-history)
-   (state :initform :level :initarg :state :accessor state)))
+   (state :initform :menu :initarg :state :accessor state)
+   (level :initform -1 :initarg :level :accessor level)))
+
+(defun flevel (num)
+  (data-path (format nil "map/~a.sexp" num)))
+
+(defun load-level (id game)
+  (typecase id
+    (number (setf (level game) id
+                  (history game) (list (load-world (flevel id)))
+                  (redo-history game) nil
+                  (state game) :level))
+    (world (setf (level game) -1
+                 (history game) (list (copy-game-object id))
+                 (redo-history game) nil
+                 (state game) :level))
+    (string (setf (level game) -1
+                  (history game) (list (load-world (data-path id)))
+                  (redo-history game) nil
+                  (state game) :level))
+    (pathname (setf (level game) -1
+                    (history game) (list (load-world id))
+                    (redo-history game) nil
+                    (state game) :level)))
+  (unless (typep (car (history game)) 'world)
+    (load-menu game)))
+
+(defun reset-level (game)
+  (setf (redo-history game) nil
+        (history game) (last (history game))))
+
+(defun load-menu (game)
+  (setf (level game) -1
+        (history game) nil
+        (redo-history game) nil
+        (state game) :menu))
 
 (defun make-game ()
-  (make-instance 'game :history (list (load-world (data-path "map/0.sexp")))))
+  (make-instance 'game))
+
+(defun next-level (game)
+  (load-level (1+ (level game)) game))

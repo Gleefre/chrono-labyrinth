@@ -97,3 +97,19 @@
   (if (eq :menu (state *game*))
       (draw-menu (/ w 2) h)
       (draw-world (/ w 2) h (car (history *game*)))))
+
+(defparameter +menu-text+
+  "Press L to load a custom level.
+
+M - [un]mute the soundtrack.
+Z / X - undo / redo;
+SPACE - skip / descend;
+Arrows, WASD - movement;
+Controls:")
+
+(defun draw-menu (w h)
+  (s+:with-fit (400 800 w h)
+    (s:with-font (s:make-font :size 30 :align :center :color s:+white+)
+      (s:text +menu-text+ 200 400))
+    (s:with-font (s:make-font :size 50 :align :center :color s:+white+)
+      (s:text "Press SPACE to start." 200 200))))
