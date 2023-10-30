@@ -7,3 +7,5 @@
 (defvar *world*)
 
 (defvar *tileset*)
+
+(defparameter *side* 64)

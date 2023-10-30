@@ -7,19 +7,19 @@
         :x (x point)
         :y (y point)
         :tileset +world-tileset+
-        :color color))
+        :color color
+        :side *side*))
 
-(defun choosed-area (choose-xy x y
-                     &aux (side (tileset-tile-side +world-tileset+)))
+(defun choosed-area (choose-xy x y)
   (if choose-xy
       (destructuring-bind (x* y*) choose-xy
         (when (> x x*) (rotatef x x*))
         (when (> y y*) (rotatef y y*))
         (let ((rect (list x y (- x* x) (- y* y))))
-          (let ((x  (floor x  side))
-                (y  (floor y  side))
-                (x* (floor x* side))
-                (y* (floor y* side)))
+          (let ((x  (floor x  *side*))
+                (y  (floor y  *side*))
+                (x* (floor x* *side*))
+                (y* (floor y* *side*)))
             (list (list x x* y y*)
                   rect))))
       (list (list 0 -1 0 -1)
@@ -44,20 +44,19 @@
       (destructuring-bind ((x x+ y y+) (x= y= w= h=))
           (apply #'choosed-area choose-xy (screen->world (or (s:in :mouse-x) 0) (or (s:in :mouse-y) 0)
                                                          s:width s:height))
-        (let ((side (tileset-tile-side +world-tileset+)))
-          (loop for xt from x to x+
-                do (loop for yt from y to y+
-                         do (when (camera-object-is-visible? (make-rectangle :x (* xt side)
-                                                                             :y (* yt side)
-                                                                             :width side
-                                                                             :height side))
-                              (s+:with-color (s:+black+)
-                                (s:rect (* xt side) (* yt side) side side))
-                              (draw-tile *editor-tile*
-                                         (camera-world-to-screen
-                                          (make-point :x (* xt side)
-                                                      :y (* yt side)))
-                                         (s:rgb 1 1 1 0.9))))))
+        (loop for xt from x to x+
+              do (loop for yt from y to y+
+                       do (when (camera-object-is-visible? (make-rectangle :x (* xt *side*)
+                                                                           :y (* yt *side*)
+                                                                           :width *side*
+                                                                           :height *side*))
+                            (s+:with-color (s:+black+)
+                              (s:rect (* xt *side*) (* yt *side*) *side* *side*))
+                            (draw-tile *editor-tile*
+                                       (camera-world-to-screen
+                                        (make-point :x (* xt *side*)
+                                                    :y (* yt *side*)))
+                                       (s:rgb 1 1 1 0.9)))))
         (s+:with-color (s:+red+ :stroke)
           (s:rect x= y= w= h=))))))
 
@@ -76,25 +75,25 @@
            (setf (tile-test-choose-xy sketch) (list x y)))
           (:mousebuttonup
            (destructuring-bind (x* y*) (tile-test-choose-xy sketch)
-             (let ((side (tileset-tile-side +world-tileset+)))
-               (setf (tile-test-choose-xy sketch) nil)
-               (when (> x x*) (rotatef x x*))
-               (when (> y y*) (rotatef y y*))
-               (let ((x  (floor x  side))
-                     (y  (floor y  side))
-                     (x* (floor x* side))
-                     (y* (floor y* side)))
-                 (loop for x from x to x*
-                       do (loop for y from y to y*
-                                do (case *editor-tile*
-                                     (0 (mapcar #'remove-object (objects-at (list x y))))
-                                     (1 (toggle (list x y) 'box))
-                                     (2 (toggle (list x y) 'semi-wall))
-                                     (3 (toggle (list x y) 'hourglass))
-                                     (4 (toggle (list x y) 'ground))
-                                     (5 (toggle (list x y) 'game-block))
-                                     (6 (toggle (list x y) 'wall))
-                                     (7 (toggle (list x y) 'player))))))))))))))
+             (setf (tile-test-choose-xy sketch) nil)
+             (when (> x x*) (rotatef x x*))
+             (when (> y y*) (rotatef y y*))
+             (let ((x  (floor x  *side*))
+                   (y  (floor y  *side*))
+                   (x* (floor x* *side*))
+                   (y* (floor y* *side*)))
+               (loop for x from x to x*
+                     do (loop for y from y to y*
+                              do (case *editor-tile*
+                                   (0 (mapcar #'remove-object (objects-at (list x y))))
+                                   (1 (toggle (list x y) 'box))
+                                   (2 (toggle (list x y) 'semi-wall))
+                                   (3 (toggle (list x y) 'hourglass))
+                                   (4 (toggle (list x y) 'ground))
+                                   (5 (toggle (list x y) 'game-block))
+                                   (6 (toggle (list x y) 'wall))
+                                   (7 (toggle (list x y) 'level-exit))
+                                   (8 (toggle (list x y) 'player)))))))))))))
 
 (defmethod kit.sdl2:keyboard-event ((sketch tile-test) st ts repeat-p keysym)
   (when (eq st :keydown)
@@ -115,6 +114,7 @@
 (defparameter *quit-on-close* nil)
 
 ;; TODO: rename to editor/load-tiles.
+#+nil
 (defun load-tiles (list-box)
   (let* ((tiles (gdk-pixbuf2:make-pixbuf
                  :filename (data-path "textures/tiles-min.png")))
@@ -148,6 +148,35 @@
               (gtk:list-box-insert list-box box tile-count)
               (incf tile-count))))))))
 
+(defun load-modes (list-box &aux (tile-count -1))
+  (labels ((tile-pixbuf (tileset id &aux (side (tileset-tile-side tileset)))
+             (multiple-value-bind (y x) (floor id (tileset-columns tileset))
+               (gdk-pixbuf2:pixbuf-new-subpixbuf
+                (gdk-pixbuf2:make-pixbuf
+                 :filename (data-path (tileset-filename tileset)))
+                (* x side)
+                (* y side)
+                side
+                side)))
+           (mode (name tileset id)
+             (let ((image (tile-pixbuf tileset id))
+                   (box (gtk:make-box :orientation gtk:+orientation-vertical+
+                                      :spacing 5))
+                   (label (gtk:make-label :str name)))
+               (gtk:box-append box image)
+               (gtk:box-append box label)
+
+               (setf (gtk:widget-margin-start box) 5)
+               (setf (gtk:widget-margin-top box) 5)
+               (setf (gtk:widget-margin-end box) 5)
+               (setf (gtk:widget-margin-bottom box) 5)
+
+               (gtk:list-box-insert list-box box (incf tile-count)))))
+    (mapcar (lambda (name id) (mode name +world-tileset+ id))
+            '("Empty" "Box" "Semi Wall" "Hourglass" "Ground" "Moving block" "Wall" "Exit")
+            (a:iota 8))
+    (mode "Player" +character-tileset+ 0)))
+
 #+darwin
 (defmethod kit.sdl2:mousebutton-event :around ((sketch tile-test) st ts but x y)
   (let ((m 2))
@@ -170,7 +199,7 @@
                              :spacing 4)))
       (let ((scrolled-window (gtk:make-scrolled-window))
             (list-box (gtk:make-list-box)))
-        (load-tiles list-box)
+        (load-modes list-box)
         (gtk:connect list-box "row-activated"
                      (lambda (self row)
                        (declare (ignore self))

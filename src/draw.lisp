@@ -35,7 +35,7 @@
       ((:right) 3))))
 
 (defmethod draw-object ((object game-object))
-  (tile (object->tile object)))
+  (tile (object->tile object) :side *side*))
 
 (defmethod draw-object :around ((object player))
   (let ((*tileset* +character-tileset+))
@@ -45,10 +45,9 @@
   (with-slots (position) object
     (when position
       (destructuring-bind (x y) position
-        (let* ((side (tileset-tile-side +world-tileset+))
-               (rx (* side x))
-               (ry (* side y)))
-          (when (camera-object-is-visible? (make-rectangle :x rx :y ry :width side :height side))
+        (let ((rx (* *side* x))
+              (ry (* *side* y)))
+          (when (camera-object-is-visible? (make-rectangle :x rx :y ry :width *side* :height *side*))
             (s:with-translate (rx ry)
               (call-next-method))))))))
 
