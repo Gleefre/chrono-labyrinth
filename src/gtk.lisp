@@ -40,7 +40,7 @@
             (list -1 -1 0 0))))
 
 (defun screen->world (x y width height)
-  (destructuring-bind (x y) (s+:fit-point x y
+  (destructuring-bind (x y) (s+:fit-point x (- height y)
                                           (camera-view-port-width) (camera-view-port-height)
                                           width height)
     (let ((world-point (camera-screen-to-world (make-point :x x :y y))))
@@ -49,7 +49,8 @@
 
 (s:defsketch world-viewer ((s:title "tile")
                            (choose-xy nil)
-                           (world (make-instance 'world)))
+                           (world (make-instance 'world))
+                           (s:y-axis :up))
   (s:background s:+black+)
   (s+:with-fit ((camera-view-port-width) (camera-view-port-height) s:width s:height)
     (s:with-pen (s:make-pen)
