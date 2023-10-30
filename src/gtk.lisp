@@ -1,12 +1,5 @@
 (in-package #:chrono-labyrinth)
 
-(defparameter +tileset-min+
-  (make-instance 'tileset
-                 :filename "textures/tiles-min.png"
-                 :tile-side 32
-                 :columns 4
-                 :count 8))
-
 ;(defconstant +tile-side+ 32)
 ;(defconstant +tile-count+ 8)
 
@@ -22,7 +15,7 @@
   (tile tile-id
         :x (x point)
         :y (y point)
-        :tileset +tileset-min+
+        :tileset +world-tileset+
         :color color))
 
 (defun choosed-area (choose-xy x y)
