@@ -6,11 +6,12 @@
 #+language: en
 
 * Installation
+ Note: Dependencies are a bit outdated. For example gtk4 bindings are required for the editor.
 ** From source
 *** Requirements
     - Libraries (most of them are available from quicklisp)
       - Depends on [[https://github.com/vydd/sketch][sketch]], [[https://github.com/Gleefre/sketch-utils][sketch-utils]], [[https://github.com/Gleefre/stopclock][stopclock]], [[https://alexandria.common-lisp.dev/][alexandria]], [[https://github.com/ruricolist/serapeum][serapeum]] and [[https://github.com/Shinmera/deploy/][deploy]].
-      - You will need to use ~gleefre/dev~ branch of my sketch's [[https://github.com/Gleefre/sketch][fork]].
+      - You will need to use ~gleefre/dump-for-gamejam~ branch of my sketch's [[https://github.com/Gleefre/sketch][fork]].
       - You will need to install [[https://github.com/Gleefre/sketch-utils][sketch-utils]] from source, while other libraries are available from [[https://www.quicklisp.org/beta/][quicklisp]].
     - Foreign dependencies
       - SDL2, SDL2 Image, SDL2 TTF
@@ -20,7 +21,7 @@
      You can fetch all non-quicklisp libraries with git clone:
      #+BEGIN_SRC bash
      cd $HOME/quicklisp/local-projects/
-     git clone https://github.com/Gleefre/sketch -b gleefre/dev
+     git clone https://github.com/Gleefre/sketch -b gleefre/dump-for-gamejam
      git clone https://github.com/Gleefre/sketch-utils
      #+END_SRC
 *** Running from source
