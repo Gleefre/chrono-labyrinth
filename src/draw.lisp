@@ -109,14 +109,14 @@
       (draw-world (/ w 2) h (car (history *game*)))))
 
 (defparameter +menu-text+
-  (format nil "Press L to load a custom level.~2%~
-               M - [un]mute the soundtrack.~%~
-               Q - menu~%~
-               R - restart the level~%~
-               Z / X - undo / redo;~%~
-               SPACE - skip / descend;~%~
-               Arrows, WASD - movement;~%~
-               Controls:~%"))
+  (format nil "Press L to load a custom level.~2%
+M - [un]mute the soundtrack.~%
+Q - menu~%
+R - restart the level~%
+Z / X - undo / redo;~%
+SPACE - skip / descend;~%
+Arrows, WASD - movement;~%
+Controls:~%"))
 
 (defun draw-menu (w h)
   (s+:with-fit (400 800 w h)
