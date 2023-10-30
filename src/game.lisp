@@ -38,13 +38,18 @@
            (setf (history *game*) (last (history *game*))))
           ((:scancode-z)
            (unless (null (cdr (history *game*)))
-             (pop (history *game*)))))))
+             (pop (history *game*))))))
+    (when (eq :scancode-m (sdl2:scancode keysym))
+      (toggle-soundtrack)))
   (when (and rep? (eq :scancode-z (sdl2:scancode keysym)))
     (unless (null (cdr (history *game*)))
       (pop (history *game*)))))
 
 (s:define-start-function (start) game-window
-                         (:resizable t :width 800 :height 500))
+                         (:resizable t :width 800 :height 500)
+  (:start (music-init) (play-soundtrack))
+  (:on-close (w) (mute-soundtrack))
+  (:quit (music-quit)))
 
 (defmethod kit.sdl2:mousebutton-event :around ((window game-window) state ts button x y)
   (let ((*game* (game-window-game window))
