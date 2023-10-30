@@ -53,10 +53,11 @@
               (call-next-method))))))))
 
 (defun draw-world (width height &optional (world *world*))
-  (let ((*tileset* +world-tileset+))
-    (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
-      (with-camera-view ()
-        (map nil #'draw-object (layered (world-objects world)))))))
+  (s:with-pen (s:make-pen)
+    (let ((*tileset* +world-tileset+))
+      (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
+        (with-camera-view ()
+          (map nil #'draw-object (layered (world-objects world))))))))
 
 ;; TODO figure out sketch figures?
 (defun draw-clock (clock w h &aux (time (sc:time clock)))
