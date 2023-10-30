@@ -11,7 +11,13 @@
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
-               "bordeaux-threads")
+               "bordeaux-threads"
+               "harmony" "cl-mixed-vorbis"
+               #+(and linux (not android)) "cl-mixed-pulse"
+               #+android "cl-mixed-aaudio"
+               #+darwin "cl-mixed-coreaudio"
+               #+windows "cl-mixed-wasapi"
+               #+bsd "cl-mixed-oss")
 
   :pathname "src"
   :serial T
