@@ -33,7 +33,7 @@
           (remove-object object)))
       (cleanup-world)
       (when (eq :backwards (world-time-flow world))
-        (decf (world-time-flow world)))
+        (decf (world-backwards-charges world)))
       (a:when-let* ((player (object-by-name :player))
                     (player-position (object-position player)))
         (loop for h? in (statics-at player-position)
