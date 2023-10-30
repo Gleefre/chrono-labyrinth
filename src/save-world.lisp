@@ -32,7 +32,10 @@
 
 (defmethod object->untagged-list append ((world world))
   (list :time-flow (world-time-flow world)
-        :objects (mapcar #'object->list (reverse (world-objects world)))))
+        :objects (mapcar #'object->list
+                         (reverse
+                          (remove-if-not #'object-position
+                                         (world-objects world))))))
 
 ;;; Converting from list
 
