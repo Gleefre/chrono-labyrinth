@@ -35,7 +35,13 @@
              (pop (history *game*)))))
         (case (sdl2:scancode keysym)
           ((:scancode-r)
-           (setf (history *game*) (last (history *game*))))))))
+           (setf (history *game*) (last (history *game*))))
+          ((:scancode-z)
+           (unless (null (cdr (history *game*)))
+             (pop (history *game*)))))))
+  (when (and rep? (eq :scancode-z (sdl2:scancode keysym)))
+    (unless (null (cdr (history *game*)))
+      (pop (history *game*)))))
 
 (s:define-start-function (start) game-window
                          (:resizable t :width 800 :height 500))
