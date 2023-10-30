@@ -104,7 +104,7 @@
 
 (defmethod primary-actionp ((player player) time-flow action)
   (or (eq action :stay)
-      (eq action (player-action player))
+      (eq action (timed-direction (player-action player) time-flow))
       (direct-pushp player time-flow action)))
 
 (defmethod actionp ((player player) time-flow action)
