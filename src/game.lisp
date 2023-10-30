@@ -2,7 +2,8 @@
 
 (s:defsketch game-window ((s:title "Chrono Labyrinth")
                           (game (make-game))
-                          (clock (sc:make-clock :time-source #'sdl-performance-counter)))
+                          (clock (sc:make-clock :time-source #'sdl-performance-counter))
+                          (s:y-axis :up))
   (let ((*game* game)
         (*game-clock* clock)
         (*game-window* s::*sketch*))
