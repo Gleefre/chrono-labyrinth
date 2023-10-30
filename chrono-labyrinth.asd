@@ -11,7 +11,6 @@
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
-               "bordeaux-threads"
                "file-select"
                "harmony" "cl-mixed-vorbis"
                #+(and linux (not android)) "cl-mixed-pulse"
