@@ -66,8 +66,6 @@
     (gtk:connect area "resize"
                  (lambda (area w h)
                    (declare (ignore area))
-                   (setf (camera-view-port-width) w)
-                   (setf (camera-view-port-height) h)
                    (setf (sketch:sketch-width sketch) w
                          (sketch:sketch-height sketch) h)
                    (kit.sdl2:window-event sketch :size-changed nil w h)))

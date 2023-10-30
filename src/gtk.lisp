@@ -110,6 +110,10 @@
       ((sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
        (camera-move (make-point :x 32.0))))))
 
+(defmethod kit.sdl2:window-event :after ((sketch tile-test) (type (eql :size-changed)) ts w h)
+  (setf (camera-view-port-width) w)
+  (setf (camera-view-port-height) h))
+
 (defparameter *sketch-name-for-area* 'tile-test)
 (defparameter *quit-on-close* nil)
 
