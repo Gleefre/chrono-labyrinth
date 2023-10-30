@@ -1,6 +1,6 @@
 (asdf:defsystem "chrono-labyrinth"
   :description "Chrono Labyrinth"
-  :version "0.0.0"
+  :version "0.0.1"
   :author ("Gleefre <varedif.a.s@gmail.com>"
            "Vyacheslav Mikushev")
   :licence "Apache 2.0"
