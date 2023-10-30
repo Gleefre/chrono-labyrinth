@@ -65,9 +65,14 @@
   (with-slots (program offset) game-block
     (setf offset (mod offset (length program)))))
 
-(defmethod primary-action ((game-block game-block) time-flow)
+(defmethod primary-action ((game-block game-block) (time-flow (eql :forwards)))
   (with-slots (program offset) game-block
-    (timed-direction (aref program offset) time-flow)))
+    (aref program offset)))
+
+(defmethod primary-action ((game-block game-block) (time-flow (eql :backwards)))
+  (with-slots (program offset) game-block
+    (let ((offset (mod (1- offset) (length program))))
+      (inverse-direction (aref program offset)))))
 
 (defmethod actionp ((game-block game-block) time-flow action)
   (or (eq action :stay)
