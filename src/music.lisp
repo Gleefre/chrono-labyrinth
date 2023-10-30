@@ -25,7 +25,7 @@
 (defun music-init ()
   (unless h:*server*
     (h:maybe-start-simple-server :mixers '((:music m:basic-mixer) (:effect m:basic-mixer))
-                                 :name "Waller")
+                                 :name "Chrono Labyrinth")
     (create-soundtrack)))
 
 (defun music-quit ()
