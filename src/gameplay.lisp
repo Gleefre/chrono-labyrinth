@@ -103,4 +103,6 @@
   (make-instance 'game))
 
 (defun next-level (game)
-  (load-level (1+ (level game)) game))
+  (if (minusp (level game))
+      (load-menu game)
+      (load-level (1+ (level game)) game)))

@@ -77,7 +77,17 @@
       (:menu
        (case (sdl2:scancode keysym)
          ((:scancode-space)
-          (load-level 0 *game*))))))
+          (load-level 0 *game*))
+         ((:scancode-l)
+          (handler-case
+              (multiple-value-bind (file file-p)
+                  (org.shirakumo.file-select:existing :multiple nil
+                                                      :default (data-path "map/")
+                                                      :filter '(("S-expressions" "sexp")))
+                (when file-p
+                  (load-level file *game*)))
+            (org.shirakumo.file-select:no-backend-found ()
+              (warn "No usable backend for file-select could be found!"))))))))
 
   (setf (state *game*)
         (cond ((null (history *game*))
