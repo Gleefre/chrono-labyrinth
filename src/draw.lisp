@@ -63,8 +63,8 @@
         (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
           (with-camera-view ()
             (map nil #'draw-object (layered (world-objects world))))))))
-  (when (eq (world-time-flow world) :backwards)
-    (s:with-font (s:make-font :color s:+white+ :size (/ width 10))
+  (s:with-font (s:make-font :color s:+white+ :size (/ width 10))
+    (when (eq (world-time-flow world) :backwards)
       (s:text (format nil "Time reversed, charges: ~A" (world-backwards-charges world))
               0
               0))))
@@ -90,7 +90,20 @@
     (s:with-translate (200 200)
       (draw-clock *game-clock* 400 400))
     (s:with-font (s:make-font :size 80 :align :center :color s:+white+)
-      (s:text "Chrono Labyrinth" 400 650)))
+      (s:text "Chrono Labyrinth" 400 650))
+    (s:with-font (s:make-font :color s:+white+ :size 80)
+      (case (state *game*)
+        (:menu (s:text "MENU" 0 0))
+        (:level (s:text "LEVEL" 0 0))
+        (:win (s:text "CLEARED" 0 0))
+        (:death (s:text "DEAD" 0 0))))
+    (s:with-font (s:make-font :size 70 :color s:+white+ :align :left)
+      (case (state *game*)
+        (:win (s:text "    the next level ]
+   to descent onto
+[ press SPACE " 40 -280))
+        (:death (s:text "   restart]
+[ press R to " 40 -200)))))
   (s:translate (/ w 4) 0)
   (setf (camera-view-port-width) (* 8 *side*)
         (camera-view-port-height) (* 8 *side*))
@@ -102,6 +115,8 @@
   "Press L to load a custom level.
 
 M - [un]mute the soundtrack.
+Q - menu
+R - restart the level
 Z / X - undo / redo;
 SPACE - skip / descend;
 Arrows, WASD - movement;

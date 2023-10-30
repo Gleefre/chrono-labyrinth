@@ -36,6 +36,11 @@
     (setf (history *game*) (last (history *game*))
           (redo-history *game*) nil))
 
+  (when (and (eq :keydown state)
+             (not rep?)
+             (eq :scancode-q (sdl2:scancode keysym)))
+    (load-menu *game*))
+
   (when (and (eq state :keydown)
              (not rep?))
     (case (state *game*)
