@@ -35,8 +35,10 @@
       ((:left) 2)
       ((:right) 3))))
 
+(defparameter **tile-color** nil)
+
 (defmethod draw-object ((object game-object))
-  (tile (object->tile object) :side *side*))
+  (tile (object->tile object) :side *side* :color **tile-color**))
 
 (defmethod draw-object :around ((object player))
   (let ((*tileset* +character-tileset+))
@@ -53,11 +55,19 @@
               (call-next-method))))))))
 
 (defun draw-world (width height &optional (world *world*))
-  (s:with-pen (s:make-pen)
-    (let ((*tileset* +world-tileset+))
-      (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
-        (with-camera-view ()
-          (map nil #'draw-object (layered (world-objects world))))))))
+  (let ((**tile-color** **tile-color**))
+    (when (eq (world-time-flow world) :backwards)
+      (setf **tile-color** s:+magenta+))
+    (s:with-pen (s:make-pen)
+      (let ((*tileset* +world-tileset+))
+        (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
+          (with-camera-view ()
+            (map nil #'draw-object (layered (world-objects world))))))))
+  (when (eq (world-time-flow world) :backwards)
+    (s:with-font (s:make-font :color s:+white+)
+      (s:text (format nil "Time reversed, charges: ~A" (world-backwards-charges world))
+              0
+              0))))
 
 ;; TODO figure out sketch figures?
 (defun draw-clock (clock w h &aux (time (sc:time clock)))
