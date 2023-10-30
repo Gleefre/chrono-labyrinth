@@ -11,11 +11,11 @@
 (defmethod deadp ((game-object game-object)) nil)
 
 (defmethod deadp ((box box))
-  (some (a:rcurry #'typep '(or fire game-block box player))
+  (some (a:rcurry #'typep '(or game-block box player))
         (objects-at (object-position box))))
 
 (defmethod deadp ((player player))
-  (some (a:rcurry #'typep '(or fire game-block))
+  (some (a:rcurry #'typep '(or game-block))
         (objects-at (object-position player))))
 
 (defun update-world (world &aux (time-flow (world-time-flow world)))
@@ -59,4 +59,8 @@
                  (exit-pos (object-position exit)))
     (equal player-pos exit-pos)))
 
-(defun make-game ())
+(defclass game ()
+  ((history :initform () :initarg :history :accessor history)))
+
+(defun make-game ()
+  (make-instance 'game :history (list (load-world (data-path "map/0.sexp")))))

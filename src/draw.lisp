@@ -53,9 +53,10 @@
               (call-next-method))))))))
 
 (defun draw-world (width height &optional (world *world*))
-  (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
-    (with-camera-view ()
-      (map nil #'draw-object (layered (world-objects world))))))
+  (let ((*tileset* +world-tileset+))
+    (s+:with-fit ((camera-view-port-width) (camera-view-port-height) width height)
+      (with-camera-view ()
+        (map nil #'draw-object (layered (world-objects world)))))))
 
 ;; TODO figure out sketch figures?
 (defun draw-clock (clock w h &aux (time (sc:time clock)))
@@ -73,9 +74,10 @@
           (s:line 20 0 60 0))))))
 
 (defun draw-game (w h)
-  (s+:with-fit (800 800 w h)
+  (s+:with-fit (800 800 (/ w 4) (/ h 4))
     (s:background s:+black+)
     (s:with-translate (200 200)
       (draw-clock *game-clock* 400 400))
     (s:with-font (s:make-font :size 80 :align :center :color s:+white+)
-      (s:text "Chrono Labyrinth" 400 650))))
+      (s:text "Chrono Labyrinth" 400 650)))
+  (draw-world w h (car (history *game*))))
