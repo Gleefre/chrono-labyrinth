@@ -7,10 +7,11 @@
 ;;; taken. ACTION is what action will really be taken - it can be
 ;;; different from primary-action if the destination square has a wall
 ;;; on it for example.
-(defgeneric primary-action (object time-flow))
-(defgeneric primary-actionp (object time-flow action))
-(defgeneric action (object time-flow))
-(defgeneric actionp (object time-flow action))
+(serapeum:eval-always
+  (defgeneric primary-action (object time-flow))
+  (defgeneric primary-actionp (object time-flow action))
+  (defgeneric action (object time-flow))
+  (defgeneric actionp (object time-flow action)))
 
 ;;; Caching
 
