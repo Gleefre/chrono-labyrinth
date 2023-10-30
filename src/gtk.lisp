@@ -48,8 +48,8 @@
             (y world-point)))))
 
 (s:defsketch world-viewer ((s:title "tile")
-                        (choose-xy nil)
-                        (world (make-instance 'world)))
+                           (choose-xy nil)
+                           (world (make-instance 'world)))
   (s:background s:+black+)
   (s+:with-fit ((camera-view-port-width) (camera-view-port-height) s:width s:height)
     (s:with-pen (s:make-pen)
@@ -71,6 +71,9 @@
                                         (make-point :x (* xt *side*)
                                                     :y (* yt *side*)))
                                        (s:rgb 1 1 1 0.9)))))
+        (s+:with-color (s:+blue+ :stroke)
+          (let ((origin (camera-world-to-screen (make-point))))
+            (s:rect (x origin) (y origin) (* 8 *side*) (* 8 *side*))))
         (s+:with-color (s:+red+ :stroke)
           (s:rect x= y= w= h=))))))
 
