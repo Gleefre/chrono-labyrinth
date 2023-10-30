@@ -11,20 +11,16 @@
                "stopclock"
                "alexandria" "serapeum"
                "deploy"
-               "bordeaux-threads"
-               "cl-gtk4"
-               "cl-gdk4")
+               "bordeaux-threads")
 
   :pathname "src"
   :serial T
   :components ((:file "packages")
                (:file "specials")
-               (:file "gtk-sketch-area")
                (:file "utils")
                (:file "tilesets")
                (:file "caching-methods")
                (:file "camera")
-               (:file "gtk")
                (:file "character")
                (:file "music")
                (:file "game-objects")
@@ -39,3 +35,14 @@
   :build-operation #-darwin "deploy-op" #+darwin "osx-app-deploy-op"
   :build-pathname "ChronoLabyrinth"
   :entry-point "chrono-labyrinth:start-toplevel")
+
+(asdf:defsystem "chrono-labyrinth/editor"
+  :description "Chrono Labyrinth Editor"
+  :depends-on ("chrono-labyrinth"
+               "sketch"
+               "cl-gtk4"
+               "cl-gdk4")
+  :pathname "src"
+  :serial T
+  :components ((:file "gtk-sketch-area")
+               (:file "gtk")))
