@@ -99,11 +99,8 @@
         (:death (s:text "DEAD" 0 0))))
     (s:with-font (s:make-font :size 70 :color s:+white+ :align :left)
       (case (state *game*)
-        (:win (s:text "    the next level ]
-   to descent onto
-[ press SPACE " 40 -280))
-        (:death (s:text "   restart]
-[ press R to " 40 -200)))))
+        (:win (s:text (format nil "    the next level ]~%   to descent onto~%[ press SPACE ") 40 -280))
+        (:death (s:text (format nil "   restart]~%[ press R to ") 40 -200)))))
   (s:translate (/ w 4) 0)
   (setf (camera-view-port-width) (* 8 *side*)
         (camera-view-port-height) (* 8 *side*))
@@ -112,15 +109,14 @@
       (draw-world (/ w 2) h (car (history *game*)))))
 
 (defparameter +menu-text+
-  "Press L to load a custom level.
-
-M - [un]mute the soundtrack.
-Q - menu
-R - restart the level
-Z / X - undo / redo;
-SPACE - skip / descend;
-Arrows, WASD - movement;
-Controls:")
+  (format nil "Press L to load a custom level.~2%~
+               M - [un]mute the soundtrack.~%~
+               Q - menu~%~
+               R - restart the level~%~
+               Z / X - undo / redo;~%~
+               SPACE - skip / descend;~%~
+               Arrows, WASD - movement;~%~
+               Controls:~%"))
 
 (defun draw-menu (w h)
   (s+:with-fit (400 800 w h)
