@@ -7,10 +7,10 @@
   (:method ((thing player)) 3)
   (:method ((thing box)) 3)
   (:method ((thing ground)) 1)
-  (:method ((thing wall)) 1)
-  (:method ((thing semi-wall)) 1)
+  (:method ((thing wall)) 2)
+  (:method ((thing semi-wall)) 2)
   (:method ((thing hourglass)) 2)
-  (:method ((thing level-exit)) 1))
+  (:method ((thing level-exit)) 2))
 
 (defun layered (objects)
   (flet ((layer (id)
@@ -23,6 +23,7 @@
   (:method ((thing ground)) 4)
   (:method ((thing wall)) 6)
   (:method ((thing semi-wall)) 2)
+  (:method ((thing level-exit)) 8)
   (:method ((thing hourglass))
     (if (hourglass-charged thing)
         3

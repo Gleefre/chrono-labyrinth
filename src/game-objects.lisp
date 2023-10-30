@@ -18,7 +18,7 @@
    (on-cancel :initform :repeat        :accessor block-on-cancel :initarg :on-cancel)))
 
 (defclass player (movable named-object)
-  ((action :initform :stay :accessor player-action)
+  ((action :initform :stay :accessor player-action :initarg :action)
    (name   :initform :player)))
 
 (defclass box (movable) ())

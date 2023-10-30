@@ -3,12 +3,26 @@
 (defparameter *editor-tile* 0)
 
 (defun draw-tile (tile-id point &optional color)
-  (tile tile-id
-        :x (x point)
-        :y (y point)
-        :tileset +world-tileset+
-        :color color
-        :side *side*))
+  (if (< tile-id 7)
+      (tile tile-id
+            :x (x point)
+            :y (y point)
+            :tileset +world-tileset+
+            :color color
+            :side *side*)
+      (if (= tile-id 7)
+          (tile 8
+                :x (x point)
+                :y (y point)
+                :tileset +world-tileset+
+                :color color
+                :side *side*)
+          (tile (- tile-id 8)
+                :x (x point)
+                :y (y point)
+                :tileset +character-tileset+
+                :color color
+                :side *side*))))
 
 (defun choosed-area (choose-xy x y)
   (if choose-xy
@@ -143,7 +157,7 @@
                (gtk:list-box-insert list-box box (incf tile-count)))))
     (mapcar (lambda (name id) (mode name +world-tileset+ id))
             '("Empty" "Box" "Semi Wall" "Hourglass" "Ground" "Moving block" "Wall" "Exit")
-            (a:iota 8))
+            '( 0       1     2           3           4        5              6      8))
     (mode "Player" +character-tileset+ 0)))
 
 #+darwin
