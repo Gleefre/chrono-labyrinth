@@ -9,16 +9,17 @@
         :tileset +world-tileset+
         :color color))
 
-(defun choosed-area (choose-xy x y)
+(defun choosed-area (choose-xy x y
+                     &aux (side (tileset-tile-side +world-tileset+)))
   (if choose-xy
       (destructuring-bind (x* y*) choose-xy
         (when (> x x*) (rotatef x x*))
         (when (> y y*) (rotatef y y*))
         (let ((rect (list x y (- x* x) (- y* y))))
-          (let ((x  (floor x  (tileset-tile-side +world-tileset+)))
-                (y  (floor y  (tileset-tile-side +world-tileset+)))
-                (x* (floor x* (tileset-tile-side +world-tileset+)))
-                (y* (floor y* (tileset-tile-side +world-tileset+))))
+          (let ((x  (floor x  side))
+                (y  (floor y  side))
+                (x* (floor x* side))
+                (y* (floor y* side)))
             (list (list x x* y y*)
                   rect))))
       (list (list 0 -1 0 -1)
@@ -60,6 +61,11 @@
         (s+:with-color (s:+red+ :stroke)
           (s:rect x= y= w= h=))))))
 
+(defun toggle (position type &rest initargs)
+  (if (some (a:rcurry #'typep type) (objects-at position))
+      (mapcar #'remove-object (remove-if-not (a:rcurry #'typep type) (objects-at position)))
+      (add-to-world (apply #'make-instance type :position position initargs))))
+
 (defmethod kit.sdl2:mousebutton-event ((sketch tile-test) st ts but x y)
   (declare (ignore ts))
   (let ((*world* (tile-test-world sketch)))
@@ -81,14 +87,14 @@
                  (loop for x from x to x*
                        do (loop for y from y to y*
                                 do (case *editor-tile*
-                                     (0
-                                      (mapcar #'remove-object (objects-at (list x y))))
-                                     (1
-                                      (if (some (a:rcurry #'typep 'box) (objects-at (list x y)))
-                                          (mapcar #'remove-object
-                                                  (remove-if-not (a:rcurry #'typep 'box)
-                                                                 (objects-at (list x y))))
-                                          (add-to-world (make-instance 'box :position (list x y)))))))))))))))))
+                                     (0 (mapcar #'remove-object (objects-at (list x y))))
+                                     (1 (toggle (list x y) 'box))
+                                     (2 (toggle (list x y) 'semi-wall))
+                                     (3 (toggle (list x y) 'hourglass))
+                                     (4 (toggle (list x y) 'ground))
+                                     (5 (toggle (list x y) 'game-block))
+                                     (6 (toggle (list x y) 'wall))
+                                     (7 (toggle (list x y) 'player))))))))))))))
 
 (defmethod kit.sdl2:keyboard-event ((sketch tile-test) st ts repeat-p keysym)
   (when (eq st :keydown)
@@ -158,8 +164,7 @@
     (setf (gtk:window-title window) "Chrono Maze")
     (setf (gtk:window-default-size window) '(900 800))
 
-    (setf (camera-world-rectangle) (make-rectangle :width 0
-                                                   :height 0))
+    (setf (camera-world-rectangle) (make-rectangle))
 
     (let ((box (gtk:make-box :orientation gtk:+orientation-horizontal+
                              :spacing 4)))
