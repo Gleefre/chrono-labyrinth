@@ -22,6 +22,7 @@
 
 (dont-deploy
  cl-opengl-bindings::opengl
+ #+darwin cl-glut::glut
  ;; Don't deploy audio backend libraries
  #+linux   (org.shirakumo.fraf.mixed.pulse.cffi::libpulse-simple
             org.shirakumo.fraf.mixed.pulse.cffi::libpulse
@@ -34,6 +35,10 @@
  ;; FIXME
  #+linux (sdl2::libsdl2
           sdl2-image::libsdl2-image
-          sdl2-ttf::libsdl2-ttf))
+          sdl2-ttf::libsdl2-ttf)
+
+ #+dawin (org.shirakumo.file-select.macos::cocoa
+          org.shirakumo.file-select.macos::appkit
+          org.shirakumo.file-select.macos::foundation))
 
 (asdf:make :chrono-labyrinth)
