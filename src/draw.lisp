@@ -64,7 +64,7 @@
           (with-camera-view ()
             (map nil #'draw-object (layered (world-objects world))))))))
   (when (eq (world-time-flow world) :backwards)
-    (s:with-font (s:make-font :color s:+white+)
+    (s:with-font (s:make-font :color s:+white+ :size (/ width 10))
       (s:text (format nil "Time reversed, charges: ~A" (world-backwards-charges world))
               0
               0))))
@@ -85,7 +85,7 @@
           (s:line 20 0 60 0))))))
 
 (defun draw-game (w h)
-  (s+:with-fit (800 800 (/ w 4) h)
+  (s+:with-fit (800 800 (/ w 4) (/ h 2) 0 0 0 (/ h 2))
     (s:background s:+black+)
     (s:with-translate (200 200)
       (draw-clock *game-clock* 400 400))
@@ -94,4 +94,6 @@
   (s:translate (/ w 4) 0)
   (setf (camera-view-port-width) (* 8 *side*)
         (camera-view-port-height) (* 8 *side*))
-  (draw-world (/ w 2 ) h (car (history *game*))))
+  (if (eq :menu (state *game*))
+      (draw-menu (/ w 2) h)
+      (draw-world (/ w 2) h (car (history *game*)))))
