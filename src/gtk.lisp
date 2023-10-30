@@ -128,7 +128,7 @@
                 side
                 side)))
            (mode (name tileset id)
-             (let ((image (tile-pixbuf tileset id))
+             (let ((image (gtk:make-image :pixbuf (tile-pixbuf tileset id)))
                    (box (gtk:make-box :orientation gtk:+orientation-vertical+
                                       :spacing 5))
                    (label (gtk:make-label :str name)))
