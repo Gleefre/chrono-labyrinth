@@ -106,7 +106,7 @@
        (camera-move (make-point :x 32.0))))))
 
 (defparameter *sketch-name-for-area* 'tile-test)
-(defparameter *quit-on-close* t)
+(defparameter *quit-on-close* nil)
 
 ;; TODO: rename to editor/load-tiles.
 (defun load-tiles (list-box)
@@ -143,16 +143,14 @@
               (incf tile-count))))))))
 
 #+darwin
-(defmethod kit.sdl2:mousebutton-event :around ((sketch sketch::sketch) st ts but x y)
+(defmethod kit.sdl2:mousebutton-event :around ((sketch tile-test) st ts but x y)
   (let ((m 2))
-    (call-next-method sketch st ts but (* x m) (* y m)))
-  #+()(call-next-method sketch st ts but (/ x 1.5) (/ y 1.5)))
+    (call-next-method sketch st ts but (* x m) (* y m))))
 
 #+darwin
-(defmethod kit.sdl2:mousemotion-event :around ((sketch sketch::sketch) ts bm x y xrel yrel)
+(defmethod kit.sdl2:mousemotion-event :around ((sketch tile-test) ts bm x y xrel yrel)
   (let ((m 2))
-    (call-next-method sketch ts bm (* x m) (* y m) (* xrel m) (* yrel m)))
-  #+()(call-next-method sketch ts bm (/ x 1.5) (/ y 1.5) (/ xrel 1.5) (/ yrel 1.5)))
+    (call-next-method sketch ts bm (* x m) (* y m) (* xrel m) (* yrel m))))
 
 (gtk:define-application (:name simple-counter
                          :id "chrono.maze")
@@ -187,10 +185,7 @@
 
           (let ((bottom-right-box (gtk:make-box :orientation gtk:+orientation-horizontal+
                                                 :spacing 4))
-                (exit-btn (gtk:make-button :label "Exit"))
-                                        ;(layer-1-btn (gtk:make-button :label "L1"))
-                                        ;(layer-2-btn (gtk:make-button :label "L2"))
-                                        ;(all-layers-btn (gtk:make-button :label "All"))
+                (exit-btn (gtk:make-button :label "Close"))
                 (save-btn (gtk:make-button :label "Save"))
                 (load-btn (gtk:make-button :label "Load")))
 
@@ -199,27 +194,6 @@
                                               (gtk:window-destroy window)
                                               (when *quit-on-close*
                                                 (uiop:quit))))
-
-            #+ () (gtk:connect layer-1-btn "clicked" (lambda (button)
-                                                       (declare (ignore button))
-                                                       (setf *current-layer* 1)
-                                                       (setf (gtk:widget-sensitive-p layer-1-btn) nil)
-                                                       (setf (gtk:widget-sensitive-p layer-2-btn) t)
-                                                       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
-
-            #+ () (gtk:connect layer-2-btn "clicked" (lambda (button)
-                                                       (declare (ignore button))
-                                                       (setf *current-layer* 2)
-                                                       (setf (gtk:widget-sensitive-p layer-1-btn) t)
-                                                       (setf (gtk:widget-sensitive-p layer-2-btn) nil)
-                                                       (setf (gtk:widget-sensitive-p all-layers-btn) t)))
-
-            #+ () (gtk:connect all-layers-btn "clicked" (lambda (button)
-                                                          (declare (ignore button))
-                                                          (setf *current-layer* 0)
-                                                          (setf (gtk:widget-sensitive-p layer-1-btn) t)
-                                                          (setf (gtk:widget-sensitive-p layer-2-btn) t)
-                                                          (setf (gtk:widget-sensitive-p all-layers-btn) nil)))
 
             (gtk:connect save-btn "clicked"
                          (lambda (button)
@@ -231,11 +205,6 @@
                            (declare (ignore button))
                            (setf (tile-test-world (sketch sketch-area)) (load-world "map"))))
 
-                                        ;          (setf (gtk:widget-sensitive-p layer-1-btn) nil)
-
-                                        ;          (gtk:box-append bottom-right-box all-layers-btn)
-                                        ;          (gtk:box-append bottom-right-box layer-1-btn)
-                                        ;          (gtk:box-append bottom-right-box layer-2-btn)
             (gtk:box-append bottom-right-box save-btn)
             (gtk:box-append bottom-right-box load-btn)
             (gtk:box-append bottom-right-box exit-btn)
