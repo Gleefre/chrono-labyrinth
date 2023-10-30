@@ -60,7 +60,9 @@
     (equal player-pos exit-pos)))
 
 (defclass game ()
-  ((history :initform () :initarg :history :accessor history)))
+  ((history :initform () :initarg :history :accessor history)
+   (redo-history :initform () :accessor redo-history)
+   (state :initform :level :initarg :state :accessor state)))
 
 (defun make-game ()
   (make-instance 'game :history (list (load-world (data-path "map/0.sexp")))))
