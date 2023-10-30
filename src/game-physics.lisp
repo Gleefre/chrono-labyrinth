@@ -58,7 +58,7 @@
         for dir* = (inverse-direction dir)
         for pos* = (in-direction pos dir*)
         for movable = (movable-object-at pos*)
-        when movable
+        when (typep movable 'game-block)
           count (primary-actionp movable time-flow dir)))
 
 (defmethod primary-action :before ((game-block game-block) time-flow)
