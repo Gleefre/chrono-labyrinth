@@ -37,6 +37,11 @@
           sdl2-image::libsdl2-image
           sdl2-ttf::libsdl2-ttf)
 
+ #+linux (org.shirakumo.file-select.gtk::gmodule
+          org.shirakumo.file-select.gtk::gio
+          org.shirakumo.file-select.gtk::glib
+          org.shirakumo.file-select.gtk::gtk)
+
  #+dawin (org.shirakumo.file-select.macos::cocoa
           org.shirakumo.file-select.macos::appkit
           org.shirakumo.file-select.macos::foundation))
